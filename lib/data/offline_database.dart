@@ -1,4 +1,3 @@
-
 import 'dart:async';
 import 'package:mkombozi_mobile/models/account.dart';
 import 'package:mkombozi_mobile/models/bank.dart';
@@ -7,10 +6,10 @@ import 'package:mkombozi_mobile/models/institution.dart';
 import 'package:mkombozi_mobile/models/service.dart';
 import 'package:mkombozi_mobile/models/user.dart';
 import 'package:mkombozi_mobile/models/wallet.dart';
+import 'package:mkombozi_mobile/models/wallet_or_bank.dart';
 import 'package:sqflite/sqflite.dart';
 
 class OfflineDatabase {
-
   static const String DATABASE_NAME = 'mkcb.db';
 
   User _currentUser;
@@ -20,10 +19,7 @@ class OfflineDatabase {
   User get currentUser => _currentUser;
 
   Future<void> open() async {
-    _db = await openDatabase(DATABASE_NAME,
-      version: 1,
-      onCreate: _onCreate
-    );
+    _db = await openDatabase(DATABASE_NAME, version: 1, onCreate: _onCreate);
     _currentUser = await _getCurrentUser();
   }
 
@@ -58,7 +54,8 @@ class OfflineDatabase {
     return _db.transaction((txn) async {
       final batch = txn.batch();
       batch.delete('account');
-      accounts.forEach((account) => batch.insert('account', account.toMap()));
+      accounts.forEach((account) => batch.insert('account', account.toMap(),
+          conflictAlgorithm: ConflictAlgorithm.replace));
       return await batch.commit(noResult: true);
     });
   }
@@ -72,7 +69,8 @@ class OfflineDatabase {
     return _db.transaction((txn) {
       final batch = txn.batch();
       batch.delete('device');
-      devices.forEach((device) => batch.insert('device', device.toMap()));
+      devices.forEach((device) => batch.insert('device', device.toMap(),
+          conflictAlgorithm: ConflictAlgorithm.replace));
       return batch.commit(noResult: true);
     });
   }
@@ -82,11 +80,37 @@ class OfflineDatabase {
     return result.map((entry) => Service.fromMap(entry)).toList();
   }
 
+  Future<List<Service>> getCoreServices() async {
+    final result = await _db.query('service', where: 'core_id = 1');
+    return result.map((entry) => Service.fromMap(entry)).toList();
+  }
+
+  Future<List<Service>> getGeneralServices() async {
+    final result = await _db.query('service', where: 'category_id IN (3, 4)');
+    return result.map((entry) => Service.fromMap(entry)).toList();
+  }
+
+  Future<List<Service>> getServiceByAppCategory(String id) async {
+    final result = await _db.query('service', where: 'app_category_id = ? AND core_id != 1', whereArgs: [id]);
+    return result.map((entry) => Service.fromMap(entry)).toList();
+  }
+
+  // Future<List<WalletOrBank>> getBanksOrWallets(String type) async {
+  //   assert(type == 'bank' || type == 'wallet');
+  //   final result = await _db.query(type);
+  //   return result.map((entry) {
+  //     return type == 'bank'
+  //         ? Bank.fromMap(entry)
+  //         : Wallet.fromMap(entry);
+  //   }).toList().cast<WalletOrBank>();
+  // }
+
   Future<void> saveServices(List<Service> services) async {
     return _db.transaction((txn) {
       final batch = txn.batch();
       batch.delete('service');
-      services.forEach((service) => batch.insert('service', service.toMap()));
+      services.forEach((service) => batch.insert('service', service.toMap(),
+          conflictAlgorithm: ConflictAlgorithm.replace));
       return batch.commit(noResult: true);
     });
   }
@@ -100,7 +124,8 @@ class OfflineDatabase {
     return _db.transaction((txn) {
       final batch = txn.batch();
       batch.delete('institution');
-      institutions.forEach((item) => batch.insert('institution', item.toMap()));
+      institutions.forEach((item) => batch.insert('institution', item.toMap(),
+          conflictAlgorithm: ConflictAlgorithm.replace));
       return batch.commit(noResult: true);
     });
   }
@@ -114,7 +139,8 @@ class OfflineDatabase {
     return _db.transaction((txn) {
       final batch = txn.batch();
       batch.delete('wallet');
-      wallets.forEach((wallet) => batch.insert('wallet', wallet.toMap()));
+      wallets.forEach((wallet) => batch.insert('wallet', wallet.toMap(),
+          conflictAlgorithm: ConflictAlgorithm.replace));
       return batch.commit(noResult: true);
     });
   }
@@ -126,13 +152,13 @@ class OfflineDatabase {
 
   Future<void> saveBanks(List<Bank> banks) async {
     return _db.transaction((txn) {
-    final batch = txn.batch();
-    batch.delete('bank');
-    banks.forEach((bank) => batch.insert('bank', bank.toMap()));
-    return batch.commit(noResult: true);
+      final batch = txn.batch();
+      batch.delete('bank');
+      banks.forEach((bank) => batch.insert('bank', bank.toMap(),
+          conflictAlgorithm: ConflictAlgorithm.replace));
+      return batch.commit(noResult: true);
     });
   }
-
 
   void _onCreate(Database db, int version) async {
     final userTable = '''
@@ -169,7 +195,7 @@ class OfflineDatabase {
     final serviceTable = '''
       CREATE TABLE service (
         id TEXT PRIMARY KEY,
-        mti TEXT UNIQUE,
+        mti TEXT,
         name TEXT,
         description TEXT,
         logo TEXT,

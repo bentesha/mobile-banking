@@ -1,16 +1,21 @@
 
-import 'dart:io';
-
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mkombozi_mobile/models/account.dart';
-import 'package:mkombozi_mobile/pages/account_statement.dart';
+import 'package:mkombozi_mobile/models/service.dart';
+import 'package:mkombozi_mobile/pages/bill_payment.dart';
+import 'package:mkombozi_mobile/pages/cash_out_page.dart';
+import 'package:mkombozi_mobile/pages/select_destination_account.dart';
+import 'package:mkombozi_mobile/pages/select_service.dart';
+import 'package:mkombozi_mobile/pages/select_cash_out_method.dart';
+import 'package:mkombozi_mobile/pages/send_money_page.dart';
 import 'package:mkombozi_mobile/services/account_service.dart';
 import 'package:mkombozi_mobile/widgets/account_card.dart';
-import 'package:mkombozi_mobile/pages/luku_token_list.dart';
 import 'package:mkombozi_mobile/widgets/drawer_menu.dart';
+import 'package:mkombozi_mobile/widgets/progress_view.dart';
+import 'package:mkombozi_mobile/widgets/service_logo.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -27,6 +32,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
 
+  Account currentAccount;
+
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
@@ -39,9 +46,11 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Header(),
+            Header(onChanged: (account) => currentAccount = account),
             ActionBar(),
-            ServiceList()
+            Flexible(
+              child: ServiceList(),
+            )
           ],
         )
       ),
@@ -51,53 +60,51 @@ class _HomePageState extends State<HomePage> {
 
 class ServiceList extends StatelessWidget {
 
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      shrinkWrap: true,
-      children: [
-        ServiceTile(
-          icon: Image.asset('assets/government-tz.png', height: 32, width: 32),
-          name: 'GePG',
-          description: 'Government Services',
-        ),
-        Divider(height: 1),
-        ServiceTile(
-          icon: SvgPicture.asset('assets/bulb.svg', color: Colors.blue.shade800, height: 32, width: 32),
-          name: 'LUKU',
-          description: 'Electricity Services',
-        ),
-        Divider(height: 1),
-        ServiceTile(
-          icon: SvgPicture.asset('assets/water-tap.svg', color: Colors.blue.shade800, height: 32, width: 32),
-          name: 'DAWASCO',
-          description: 'Water Payment Services',
-        ),
-        Divider(height: 1),
-        ServiceTile(
-          icon: SvgPicture.asset('assets/payment.svg', color: Colors.blue.shade800, height: 32, width: 32),
-          name: 'PAYMENT',
-          description: 'Payment Solution',
-        ),
-        Divider(height: 1)
-      ],
-    );
+  _handleItemPressed(BuildContext context, Service service)  {
+    final state = context.findAncestorStateOfType<_HomePageState>();
+    BillPaymentPage.navigateTo(context, state.currentAccount, service);
   }
 
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<AccountService>(
+      builder: (context, accountService, _) => FutureBuilder<List<Service>>(
+        initialData: [],
+        future: accountService.getCoreServices(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return ProgressView();
+          }
+          return ListView.separated(
+            // shrinkWrap: true,
+            itemCount: snapshot.data.length,
+            separatorBuilder: (context, index) => Divider(height: 1),
+            itemBuilder: (context, index) => ServiceTile(
+              icon: ServiceLogo(service: snapshot.data[index], height: 32, width: 32),
+              name: snapshot.data[index].name,
+              description: snapshot.data[index].description,
+              onPressed: () { _handleItemPressed(context, snapshot.data[index]); },
+            ),
+          );
+        },
+      )
+    );
+  }
 }
 
 class ServiceTile extends StatelessWidget {
 
-  ServiceTile({this.icon, this.name, this.description });
+  ServiceTile({this.icon, this.name, this.description, this.onPressed });
 
   final Widget icon;
   final String name;
   final String description;
+  final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {},
+      onTap: onPressed,
       child: ListTile(
         leading: Container(
             height: double.infinity,
@@ -122,6 +129,10 @@ class ServiceTile extends StatelessWidget {
 }
 
 class Header extends StatelessWidget {
+
+  Header({this.onChanged});
+
+  final ValueChanged<Account> onChanged;
 
   build(context) {
     return Container(
@@ -169,10 +180,19 @@ class Header extends StatelessWidget {
                     if (snapshot.connectionState != ConnectionState.done) {
                       return Container();
                     }
+                    if (onChanged != null && snapshot.data.length > 0) {
+                      onChanged(snapshot.data.first);
+                    }
                     return CarouselSlider(
                         options: CarouselOptions(
                           viewportFraction: 0.8,
                           enableInfiniteScroll: false,
+                          onPageChanged: (index, _) {
+                            if (onChanged == null) {
+                              return;
+                            }
+                            onChanged(snapshot.data[index]);
+                          }
                         ),
                         items: snapshot.data.map((account) => AccountCard(account: account)).toList()
                     );
@@ -190,12 +210,39 @@ class Header extends StatelessWidget {
 
 class ActionBar extends StatelessWidget {
 
+
   @override
   Widget build(BuildContext context) {
+    final state = context.findAncestorStateOfType<_HomePageState>();
+    final account = state.currentAccount;
+
+    void _handleActionButton(int index) async {
+      if (index == 0) {
+        final service = await SelectCategoryPage.navigateTo(context);
+        if (service == null) {
+          return;
+        }
+        BillPaymentPage.navigateTo(context, account, service);
+      } else if (index == 1) {
+        final walletOrBank = await SelectDestinationAccountPage.navigateTo(context);
+        if (walletOrBank == null) {
+          return;
+        }
+        SendMoneyPage.navigateTo(context, account, walletOrBank);
+      } else if (index == 2) {
+        final method = await SelectWithdrawalMethodPage.navigateTo(context);
+        if (method == null) {
+          return;
+        }
+        CashOutPage.navigateTo(context, account, method);
+      }
+    }
+
     return Ink(
       padding: EdgeInsets.symmetric(vertical: 8),
       color: Color(0xff086086),
       child: BottomNavigationBar(
+          onTap: _handleActionButton,
           elevation: 0,
           selectedItemColor: Color(0xffa3cc55),
           unselectedItemColor: Color(0xffa3cc55),
@@ -219,14 +266,18 @@ class ActionBar extends StatelessWidget {
             BottomNavigationBarItem(
                 icon: Padding(
                   padding: EdgeInsets.only(bottom: 8),
-                  child: Icon(Icons.person_outlined),
+                  child: Icon(Icons.login),
                 ),
-                label: 'PAY PERSON'
+                label: 'SEND MONEY'
             ),
             BottomNavigationBarItem(
                 icon: Padding(
                   padding: EdgeInsets.only(bottom: 8),
-                  child: Icon(Icons.payment),
+                  child: SvgPicture.asset('assets/cash-out.svg',
+                    height: 24,
+                    width: 24,
+                    color: Theme.of(context).accentColor
+                  ),
                 ),
                 label: 'CASH OUT'
             )

@@ -13,7 +13,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final loginService = Provider.of<LoginService>(context);
-    print('current user: ${loginService.currentUser}');
     final initialRoute = loginService.currentUser == null ?
         LoginPage.routeName : HomePage.routeName;
 
@@ -21,8 +20,9 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
-        accentColor: Colors.blue,
+        accentColor: Color(0xffa3cc55),
         canvasColor: Colors.white,
+        primaryColor: Color(0xff086086),
         textTheme: theme.textTheme.copyWith(
           caption: theme.textTheme.caption.copyWith(color: Colors.blue.shade700)
         ),

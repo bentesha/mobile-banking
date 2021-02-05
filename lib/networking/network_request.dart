@@ -9,7 +9,9 @@ import 'package:mkombozi_mobile/networking/network_response.dart';
 abstract class NetworkRequest<T extends NetworkResponse> {
 
   static const END_POINT = 'http://41.188.154.221:8000/api/mobile/';
-
+  static const SERVICE_IMAGE_BASE_URL = '${END_POINT}service_logos/';
+  static const BANK_IMAGE_BASE_URL = '${END_POINT}bank_logos/';
+  static const WALLET_IMAGE_BASE_URL = '${END_POINT}wallet_logos/';
   static const DEVICE_ID = '27fd082e222be23d';
 
   static const APP_VERSION = '1.6.0';

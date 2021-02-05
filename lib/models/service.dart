@@ -1,5 +1,7 @@
 
 
+import 'package:mkombozi_mobile/networking/network_request.dart';
+
 class Service {
 
   String id;
@@ -21,7 +23,7 @@ class Service {
     name = data['name'];
     description = data['description'];
     logo = data['logo'];
-    controlNumber = data['control_number'];
+    controlNumber = data['control_number_id'];
     categoryId = data['category_id'];
     stateId = data['state_id'];
     coreId = data['core_id'];
@@ -32,7 +34,7 @@ class Service {
   Service.fromNetwork(Map<String, dynamic> data) {
     id = data['id'];
     name = data['txt_name'];
-    mti = data['txt_mti'];
+    mti = data['int_MTI'];
     logo = data['txt_logo'];
     controlNumber = data['opt_mx_has_control_number_id'];
     categoryId = data['opt_mx_service_category_id'];
@@ -50,7 +52,7 @@ class Service {
     'name': name,
     'description': description,
     'logo': logo,
-    'control_number': controlNumber,
+    'control_number_id': controlNumber,
     'category_id': categoryId,
     'app_category_id': appCategoryId,
     'state_id': stateId,
@@ -58,4 +60,8 @@ class Service {
     'row_value': rowValue,
     'limit_category_id': limitCategoryId
   };
+
+  String get logoUrl {
+    return NetworkRequest.SERVICE_IMAGE_BASE_URL + (logo ?? '');
+  }
 }

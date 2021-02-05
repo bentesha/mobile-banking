@@ -12,7 +12,8 @@ class ConfigResponse extends NetworkResponse {
   List<Service> services;
   List<Bank> banks;
   List<Wallet> wallets;
+  List<Service> coreServices;
 
-  ConfigResponse(int code, String message, this.type, {this.institutions, this.services, this.banks, this.wallets}) : super(code, message);
+  ConfigResponse(int code, String message, this.type, {this.institutions, this.services, this.banks, this.wallets, this.coreServices}) : super(code, message);
 
 }

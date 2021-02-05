@@ -1,51 +1,84 @@
 
 import 'package:flutter/material.dart';
+import 'package:mkombozi_mobile/models/service.dart';
+import 'package:mkombozi_mobile/pages/select_service.dart';
+import 'package:mkombozi_mobile/widgets/form_cell.dart';
+import 'package:mkombozi_mobile/widgets/service_logo.dart';
 
-class ServiceSelector extends StatelessWidget {
+class ServiceSelector extends StatefulWidget {
 
-  build(context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(Icons.person),
-        SizedBox(width: 16),
-        Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(height: 6),
-                Text('Send money to',
-                    style: Theme.of(context).textTheme.caption
-                ),
-                SizedBox(height: 8),
-                Row(
-                  children: [
-                    Image.asset('assets/government-tz.png', height: 32, width: 32),
-                    SizedBox(width: 8),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('GePE',
-                            style: TextStyle(
-                                fontSize: 18
-                            )
-                        ),
-                        Text('Government Services',
-                            style: Theme.of(context).textTheme.caption.copyWith(color: Colors.grey.shade600)
-                        )
-                      ],
-                    )
-                  ],
-                )
-              ],
-            )
-        ),
-        Padding(
-            padding: EdgeInsets.only(top: 24),
-            child: Icon(Icons.chevron_right)
-        )
-      ],
-    );
+  ServiceSelector({@required this.label, @required this.icon, @required this.service, @required this.onChanged});
+
+  final String label;
+  final Widget icon;
+  final Service service;
+  final ValueChanged<Service> onChanged;
+
+  @override
+  createState() => _ServiceSelectorState();
+
+}
+
+class _ServiceSelectorState extends State<ServiceSelector> {
+
+  Service _service;
+
+  initState() {
+    _service = widget.service;
+    super.initState();
   }
 
+  build(context) => FormCell(
+    onPressed: () { _handleOnCellPressed(context); },
+    label: widget.label,
+    icon: widget.icon,
+    trailing: Icon(Icons.chevron_right),
+    child: Row(
+      children: [
+        _getServiceImage(),
+        SizedBox(width: 8),
+        Flexible(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(_service?.name ?? '',
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                      fontSize: 18
+                  )
+              ),
+              Container(
+                  child: Text(_service?.description ?? '',
+                      // overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.caption.copyWith(color: Colors.grey.shade600)
+                  )
+              )
+            ],
+          ),
+        )
+      ],
+    )
+  );
+  
+  _handleOnCellPressed(BuildContext context) async {
+    final service = await SelectCategoryPage.navigateTo(context);
+    if (service == null) {
+      return;
+    }
+    setState(() {
+      _service = service;
+    });
+    if (widget.onChanged != null) {
+      widget.onChanged(service);
+    }
+  }
+  
+  Widget _getServiceImage() {
+    return _service != null
+        ? ServiceLogo(
+            service: _service,
+            height: 48,
+            width: 48,
+    ) : Container();
+  }
 }

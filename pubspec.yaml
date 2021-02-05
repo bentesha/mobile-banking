@@ -36,6 +36,7 @@ dependencies:
   pin_code_fields: ^6.1.0
   shortid: ^0.1.1
   intl: ^0.16.1
+  cached_network_image: ^2.5.0
 
 dev_dependencies:
   flutter_test:

@@ -1,5 +1,8 @@
 
-class Bank {
+import 'package:mkombozi_mobile/models/wallet_or_bank.dart';
+import 'package:mkombozi_mobile/networking/network_request.dart';
+
+class Bank implements WalletOrBank {
 
   String bin;
   String name;
@@ -13,7 +16,7 @@ class Bank {
 
   Bank.fromNetwork(Map<String, dynamic> data) {
     name = data['txt_name'];
-    bin = data['txt_bin'];
+    bin = data['int_bin'];
     logo = data['txt_logo'];
   }
 
@@ -22,4 +25,8 @@ class Bank {
     'name': name,
     'logo': logo
   };
+
+  String get logoUrl => logo == null ? null : NetworkRequest.BANK_IMAGE_BASE_URL + logo;
+
+  bool get isWallet => false;
 }

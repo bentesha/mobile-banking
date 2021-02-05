@@ -1,4 +1,6 @@
 
+import 'package:mkombozi_mobile/helpers/formatters.dart';
+
 class Account {
 
   String id;
@@ -34,4 +36,6 @@ class Account {
     'subscriber_id': subscriberId,
     'institution_id': institutionId
   };
+
+  String get maskedNumber => Formatter.maskAccountNumber(accountNumber);
 }

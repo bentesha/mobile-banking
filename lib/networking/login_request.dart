@@ -28,17 +28,19 @@ class LoginRequest extends NetworkRequest<LoginResponse> {
   @override
   NetworkResponse createResponse(Map<String, dynamic> data) {
     final Map<String, dynamic> response = data['response'];
-    final int status = response['code'];
+    final int code = response['code'];
     final String message = response['message'];
-    final result = LoginResponse(status, message);
-    final accounts = asMapList(data['accounts']);
-    final services = asMapList(data['services']);
-    final devices = asMapList(data['devices']);
-    result.subscriber = User.fromNetwork(data['subscriber']);
-    result.accounts = accounts.map((entry) => Account.fromNetwork(entry)).toList();
-    result.services = services.map((entry) => Service.fromNetwork(entry)).toList();
-    result.devices = devices.map((entry) => Device.fromNetwork(entry)).toList();
+    final result = LoginResponse(code, message);
 
+    if (code == 200) {
+      final accounts = asMapList(data['accounts']);
+      final services = asMapList(data['services']);
+      final devices = asMapList(data['devices']);
+      result.subscriber = User.fromNetwork(data['subscriber']);
+      result.accounts = accounts.map((entry) => Account.fromNetwork(entry)).toList();
+      result.services = services.map((entry) => Service.fromNetwork(entry)).toList();
+      result.devices = devices.map((entry) => Device.fromNetwork(entry)).toList();
+    }
     return result;
   }
 
