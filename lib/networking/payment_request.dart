@@ -17,8 +17,9 @@ abstract class PaymentRequest extends NetworkRequest<PaymentResponse> {
   Service service;
   String pin;
   double amount;
+  String referenceNumber;
   String reference;
-  bool savePayee;
+  bool savePayee = false;
 
   @override
   @mustCallSuper
@@ -30,7 +31,7 @@ abstract class PaymentRequest extends NetworkRequest<PaymentResponse> {
     'subscriber': account.subscriberId,
     'source': '1',
     'request_id': shortid.generate(),
-    'amount': amount,
+    'amount': amount.toString(),
     'retrievalReferenceNumber': shortid.generate(),
     'savePayee': savePayee ? '1' : '0',
     'reference': reference,

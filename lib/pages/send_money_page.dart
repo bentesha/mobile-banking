@@ -1,8 +1,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:mkombozi_mobile/dialogs/message_dialog.dart';
+import 'package:mkombozi_mobile/dialogs/pin_dialog.dart';
+import 'package:mkombozi_mobile/helpers/formatters.dart';
 import 'package:mkombozi_mobile/models/account.dart';
 import 'package:mkombozi_mobile/models/wallet_or_bank.dart';
+import 'package:mkombozi_mobile/networking/send_money_request.dart';
+import 'package:mkombozi_mobile/services/login_service.dart';
 import 'package:mkombozi_mobile/widgets/account_selector.dart';
 import 'package:mkombozi_mobile/widgets/form_cell_divider.dart';
 import 'package:mkombozi_mobile/widgets/form_cell_input.dart';
@@ -10,6 +14,7 @@ import 'package:mkombozi_mobile/widgets/label_value_cell.dart';
 import 'package:mkombozi_mobile/widgets/wallet_or_bank_selector.dart';
 import 'package:mkombozi_mobile/widgets/workflow.dart';
 import 'package:mkombozi_mobile/widgets/workflow_item.dart';
+import 'package:provider/provider.dart';
 
 class SendMoneyPage extends Workflow<_FormData> {
   static void navigateTo(
@@ -55,7 +60,7 @@ class _StepOne extends WorkflowItem {
       message = 'Service is required';
     } else if (_data._amount == null || _data.amount.isEmpty) {
       message = 'Enter amount';
-    } else if (_data._reference == null || _data.reference.isEmpty) {
+    } else if (_data._reference == null || _data.referenceNumber.isEmpty) {
       message = 'Enter reference number';
     }
 
@@ -86,7 +91,7 @@ class _StepOne extends WorkflowItem {
                 _data.walletOrBank = value;
                 // If bank/wallet changes, clear reference number
                 if (_notifier.value.bin != value.bin) {
-                  _data.reference = '';
+                  _data.referenceNumber = '';
                 }
                 _notifier.value = value;
               }
@@ -99,10 +104,10 @@ class _StepOne extends WorkflowItem {
           ),
           FormCellDivider(),
           FormCellInput(
-              onChanged: (value) => _data.reference = value,
+              onChanged: (value) => _data.referenceNumber = value,
               label: _data.walletOrBank.isWallet ? 'Phone Number' : 'Account Number',
               hintText: 'Enter ' + (_data._walletOrBank.isWallet ? 'phone number' : 'account number'),
-              initialValue: _data.reference,
+              initialValue: _data.referenceNumber,
               icon: Icon(Icons.money)),
           FormCellDivider(),
           FormCellInput(
@@ -117,8 +122,8 @@ class _StepOne extends WorkflowItem {
           FormCellDivider(),
           FormCellInput(
             label: 'Reference',
-            initialValue: _data.notes,
-            onChanged: (value) => _data.notes = value,
+            initialValue: _data.reference,
+            onChanged: (value) => _data.reference = value,
             hintText: 'For your reference',
             icon: Icon(Icons.notes),
           )
@@ -134,8 +139,33 @@ class _StepTwo extends WorkflowItem {
   _StepTwo(this._data);
 
   @override
-  void complete(context) {
-    print('On complete: Step 2');
+  Future<bool> complete(context) async {
+    final pin = await PinCodeDialog.show(context);
+    print('PIN $pin');
+    if (pin == null) {
+      return false;
+    }
+    final user = Provider.of<LoginService>(context, listen: false);
+    final request = SendMoneyRequest();
+    request.walletOrBank = _data._walletOrBank;
+    request.account = _data._account;
+    request.pin = pin;
+    request.user = user.currentUser;
+    request.referenceNumber = _data.referenceNumber;
+    final amount = double.parse(_data._amount.replaceAll(',', ''));
+    request.amount = amount;
+    request.reference = _data._reference;
+
+    final response = await request.send();
+    if (response.code == 200) {
+      final title = 'Money Sent';
+      final message = '${Formatter.formatCurrency(amount)} was sent to ${_data.referenceNumber}';
+      await MessageDialog.show(context, message, title);
+      return true;
+    }
+
+    await MessageDialog.show(context, response.message, 'Sending Payment Failed!');
+    return false;
   }
 
   @override
@@ -165,11 +195,11 @@ class _StepTwo extends WorkflowItem {
                       LabelValueCell(
                           label: 'Send to', value: _data.walletOrBank.name),
                       LabelValueCell(
-                          label: _data.walletOrBank.isWallet ? 'Phone number' : 'Account number', value: _data.reference),
+                          label: _data.walletOrBank.isWallet ? 'Phone number' : 'Account number', value: _data.referenceNumber),
                       LabelValueCell(
                           label: 'Pay from', value: _data.account.maskedNumber),
                       LabelValueCell(label: 'Amount', value: _data.amount),
-                      LabelValueCell(label: 'Reference', value: _data.notes),
+                      LabelValueCell(label: 'Reference', value: _data.reference),
                       LabelValueCell(label: 'Charges', value: '1,200.00')
                     ])))
       ],
@@ -211,16 +241,16 @@ class _FormData {
     _amount = value;
   }
 
-  String get reference => _reference;
+  String get referenceNumber => _reference;
 
-  set reference(value) {
+  set referenceNumber(value) {
     isDirty = true;
     _reference = value;
   }
 
-  String get notes => _notes;
+  String get reference => _notes;
 
-  set notes(value) {
+  set reference(value) {
     isDirty = true;
     _notes = value;
   }

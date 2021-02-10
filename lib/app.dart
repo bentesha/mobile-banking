@@ -1,6 +1,6 @@
 
 import 'package:flutter/material.dart';
-import 'package:mkombozi_mobile/pages/account_statement.dart';
+import 'package:mkombozi_mobile/pages/account_statement_page.dart';
 import 'package:mkombozi_mobile/pages/home.dart';
 import 'package:mkombozi_mobile/pages/login.dart';
 import 'package:mkombozi_mobile/pages/luku_token_list.dart';
@@ -18,6 +18,7 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp(
       title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
         accentColor: Color(0xffa3cc55),
@@ -32,9 +33,8 @@ class MyApp extends StatelessWidget {
       routes: {
         LoginPage.routeName: (_) => LoginPage(),
         HomePage.routeName: (_) => HomePage(),
-        AccountStatementPage.routeName: (_) => AccountStatementPage(),
         LukuTokenListPage.routeName: (_) => LukuTokenListPage()
-      },
+      }
     );
   }
 }

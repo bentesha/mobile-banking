@@ -7,5 +7,5 @@ abstract class WorkflowItem extends StatelessWidget {
 
   Future<bool> moveNext(BuildContext context) async => true;
 
-  void complete(BuildContext context) {}
+  Future<bool> complete(BuildContext context) async { return false; }
 }

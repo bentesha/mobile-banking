@@ -135,8 +135,8 @@ class _StepTwo extends WorkflowItem {
   _StepTwo(this._data);
 
   @override
-  void complete(context) {
-    print('On complete: Step 2');
+  Future<bool> complete(context) async {
+    return false;
   }
 
   @override

@@ -1,32 +1,31 @@
 
 import 'package:flutter/material.dart';
-import 'package:mkombozi_mobile/pages/account_statement.dart';
-import 'package:mkombozi_mobile/pages/luku_token_list.dart';
 import 'package:mkombozi_mobile/services/login_service.dart';
 import 'package:provider/provider.dart';
 
 class DrawerMenu extends StatelessWidget {
-
-  DrawerMenu(): super();
-
+  
+  DrawerMenu({@required this.onAction}): super();
+  
+  final ValueChanged<ActionType> onAction;
+  
   @override
   Widget build(BuildContext context) {
     return Drawer(
       child: ListView(
         children: [
           buildHeader(),
-          // buildItem(Icons.home, 'Home'),
-          buildItem(Icons.history_toggle_off, 'Mini Statement', AccountStatementPage.routeName),
-          buildItem(Icons.history_sharp, 'Full Statement', AccountStatementPage.routeName),
-          buildItem(Icons.lightbulb, 'My LUKU Tokens', LukuTokenListPage.routeName),
-          buildItem(Icons.money, 'Loan Application'),
-          buildItem(Icons.attach_money, 'Salary Advance'),
-          buildItem(Icons.comment_bank, 'Standing Order'),
-          buildItem(Icons.credit_card, 'Request ATM Card'),
-          buildItem(Icons.book_outlined, 'Request Cheque Book'),
-          buildItem(Icons.perm_device_info, 'My Devices'),
-          buildItem(Icons.lock_outline_rounded, 'Change PIN'),
-          buildItem(Icons.logout, 'Logout'),
+          buildItem(Icons.history_toggle_off, 'Mini Statement', ActionType.miniStatement),
+          buildItem(Icons.history_sharp, 'Full Statement', ActionType.fullStatement),
+          buildItem(Icons.lightbulb, 'My LUKU Tokens', ActionType.lukuTokens),
+          buildItem(Icons.money, 'Loan Application', ActionType.loanApplication),
+          buildItem(Icons.attach_money, 'Salary Advance', ActionType.salaryAdvance),
+          buildItem(Icons.comment_bank, 'Standing Order', ActionType.standingOrder),
+          buildItem(Icons.credit_card, 'Request ATM Card', ActionType.requestAtmCard),
+          buildItem(Icons.book_outlined, 'Request Cheque Book', ActionType.requestChequeBook),
+          buildItem(Icons.perm_device_info, 'My Devices', ActionType.myDevices),
+          buildItem(Icons.lock_outline_rounded, 'Change PIN', ActionType.changePin),
+          buildItem(Icons.logout, 'Logout', ActionType.logout),
         ],
       ),
     );
@@ -86,14 +85,15 @@ class DrawerMenu extends StatelessWidget {
     );
   }
 
-  Widget buildItem(IconData icon, String name, [String routeName]) {
+  Widget buildItem(IconData icon, String name, ActionType type) {
     return Builder(
       builder: (context) {
         return InkWell(
             onTap: () {
-              if (routeName != null) {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, routeName);
+              // Close drawer menu
+              Navigator.of(context).pop();
+              if (onAction != null) {
+                onAction(type);
               }
             },
             child: ListTile(
@@ -106,4 +106,18 @@ class DrawerMenu extends StatelessWidget {
       }
     );
   }
+}
+
+enum ActionType {
+  miniStatement,
+  fullStatement,
+  lukuTokens,
+  loanApplication,
+  salaryAdvance,
+  standingOrder,
+  requestAtmCard,
+  requestChequeBook,
+  myDevices,
+  changePin,
+  logout
 }

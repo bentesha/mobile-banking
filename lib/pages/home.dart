@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mkombozi_mobile/models/account.dart';
 import 'package:mkombozi_mobile/models/service.dart';
+import 'package:mkombozi_mobile/pages/account_statement_page.dart';
 import 'package:mkombozi_mobile/pages/bill_payment.dart';
 import 'package:mkombozi_mobile/pages/cash_out_page.dart';
 import 'package:mkombozi_mobile/pages/select_destination_account.dart';
@@ -41,7 +42,7 @@ class _HomePageState extends State<HomePage> {
     ));
 
     return Scaffold(
-      drawer: DrawerMenu(),
+      drawer: DrawerMenu(onAction: _handleDrawerMenuAction),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -55,6 +56,22 @@ class _HomePageState extends State<HomePage> {
         )
       ),
     );
+  }
+
+  _handleDrawerMenuAction(ActionType action) {
+    // Wait for the account info to load
+    if (currentAccount == null) {
+      return;
+    }
+    switch(action) {
+      case ActionType.miniStatement:
+        AccountStatementPage.navigateTo(context, StatementType.mini, currentAccount);
+        break;
+      case ActionType.fullStatement:
+        AccountStatementPage.navigateTo(context, StatementType.full, currentAccount);
+        break;
+      default:
+    }
   }
 }
 
@@ -210,31 +227,32 @@ class Header extends StatelessWidget {
 
 class ActionBar extends StatelessWidget {
 
+  Account _getCurrentAccount(BuildContext context) {
+    final state = context.findAncestorStateOfType<_HomePageState>();
+    return state.currentAccount;
+  }
 
   @override
   Widget build(BuildContext context) {
-    final state = context.findAncestorStateOfType<_HomePageState>();
-    final account = state.currentAccount;
-
     void _handleActionButton(int index) async {
       if (index == 0) {
         final service = await SelectCategoryPage.navigateTo(context);
         if (service == null) {
           return;
         }
-        BillPaymentPage.navigateTo(context, account, service);
+        BillPaymentPage.navigateTo(context, _getCurrentAccount(context), service);
       } else if (index == 1) {
         final walletOrBank = await SelectDestinationAccountPage.navigateTo(context);
         if (walletOrBank == null) {
           return;
         }
-        SendMoneyPage.navigateTo(context, account, walletOrBank);
+        SendMoneyPage.navigateTo(context, _getCurrentAccount(context), walletOrBank);
       } else if (index == 2) {
         final method = await SelectWithdrawalMethodPage.navigateTo(context);
         if (method == null) {
           return;
         }
-        CashOutPage.navigateTo(context, account, method);
+        CashOutPage.navigateTo(context, _getCurrentAccount(context), method);
       }
     }
 

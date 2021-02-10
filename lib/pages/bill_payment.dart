@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:mkombozi_mobile/dialogs/message_dialog.dart';
+import 'package:mkombozi_mobile/dialogs/pin_dialog.dart';
+import 'package:mkombozi_mobile/helpers/formatters.dart';
 import 'package:mkombozi_mobile/models/account.dart';
 import 'package:mkombozi_mobile/models/service.dart';
+import 'package:mkombozi_mobile/networking/bill_payment_request.dart';
+import 'package:mkombozi_mobile/services/login_service.dart';
 import 'package:mkombozi_mobile/widgets/account_selector.dart';
 import 'package:mkombozi_mobile/widgets/form_cell_divider.dart';
 import 'package:mkombozi_mobile/widgets/form_cell_input.dart';
@@ -9,6 +13,7 @@ import 'package:mkombozi_mobile/widgets/label_value_cell.dart';
 import 'package:mkombozi_mobile/widgets/service_selector.dart';
 import 'package:mkombozi_mobile/widgets/workflow.dart';
 import 'package:mkombozi_mobile/widgets/workflow_item.dart';
+import 'package:provider/provider.dart';
 
 class BillPaymentPage extends Workflow<_FormData> {
   static void navigateTo(
@@ -117,8 +122,31 @@ class _StepTwo extends WorkflowItem {
   _StepTwo(this._data);
 
   @override
-  void complete(context) {
-    print('On complete: Step 2');
+  Future<bool> complete(context) async {
+    final pin = await PinCodeDialog.show(context);
+    if (pin == null) {
+      return false;
+    }
+    final loginService = Provider.of<LoginService>(context, listen: false);
+    final request = BillPaymentRequest();
+    request.account = _data.account;
+    request.service = _data.service;
+    request.pin = pin;
+    request.user = loginService.currentUser;
+    request.referenceNumber = _data.reference;
+    final amount = double.parse(_data._amount.replaceAll(',', ''));
+    request.amount = double.parse(_data._amount.replaceAll(',', ''));
+    request.reference = _data.notes;
+
+    final response = await request.send();
+    if (response.code == 200) {
+      String message = '${Formatter.formatCurrency(amount)} success sent to ${_data.service.name}';
+      await MessageDialog.show(context, message, 'Success');
+      return true;
+    }
+
+    await MessageDialog.show(context, response.message, 'Failed');
+    return false;
   }
 
   @override

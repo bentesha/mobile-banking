@@ -1,6 +1,8 @@
 
+import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:mkombozi_mobile/networking/network_response.dart';
@@ -36,13 +38,39 @@ abstract class NetworkRequest<T extends NetworkResponse> {
     print('params: $params');
     request.bodyFields = params.cast();
     request.headers['content-type'] = contentType;
-    final response = await client.send(request).timeout(Duration(seconds: 5));
-    final jsonResult = await response.stream.bytesToString();
-    print('---- begin network result ----');
-    print(jsonResult);
-    print('---- end network result ----');
-    client.close();
-    return createResponse(json.decode(jsonResult));
+    try {
+      final response = await client.send(request).timeout(Duration(seconds: 10));
+      final jsonResult = await response.stream.bytesToString();
+      print('---- begin network result ----');
+      print(jsonResult);
+
+      print('---- end network result ----');
+      return createResponse(json.decode(jsonResult));
+    } on IOException catch(e) {
+      print(e);
+      final response = {
+        'code': 500,
+        'message': 'Please check your data connection or retry again later.'
+      };
+      return createResponse({ 'response': response });
+    } on TimeoutException catch(e) {
+      print(e);
+      final response = {
+        'code': 500,
+        'message': 'Please check your data connection or retry again later.'
+      };
+      return createResponse({ 'response': response });
+    } on FormatException catch(e) {
+      // Possibly the returned response body is not a valid JSON formatted string
+      print(e);
+      final response = {
+        'code': 500,
+        'message': 'Unknown server error. Please retry again shortly!'
+      };
+      return createResponse({ 'response': response });
+    } finally {
+      client.close();
+    }
   }
 
   @protected

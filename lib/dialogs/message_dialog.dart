@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 
 class MessageDialog {
 
-  static void show(BuildContext context, String message) {
-    showDialog(
+  static Future<void> show(BuildContext context, String message, [String title]) {
+    return showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        title: title == null ? null : Text(title),
         content: Text(message),
         actions: [
           FlatButton(

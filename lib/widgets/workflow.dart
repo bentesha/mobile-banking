@@ -2,6 +2,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mkombozi_mobile/dialogs/confirm_dialog.dart';
+import 'package:mkombozi_mobile/widgets/progress_view.dart';
 import 'package:mkombozi_mobile/widgets/workflow_item.dart';
 
 abstract class Workflow<TState> extends StatefulWidget {
@@ -32,6 +33,7 @@ class WorkflowState<TState> extends State<Workflow<TState>> {
   int index = 0;
   TState data;
   List<WorkflowItem> items = [];
+  bool loading = false;
 
   @override
   initState() {
@@ -78,7 +80,18 @@ class WorkflowState<TState> extends State<Workflow<TState>> {
         index++;
       });
     } else {
-      item.complete(context);
+      setState(() {
+        loading = true;
+      });
+      final result = item.complete(context);
+      result.whenComplete(() {
+        setState(() {
+          loading = false;
+        });
+      });
+      if (await result) {
+        Navigator.of(context).pop();
+      }
     }
   }
 
@@ -115,7 +128,7 @@ class WorkflowState<TState> extends State<Workflow<TState>> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               ElevatedButton(
-                onPressed: _handleActionButton,
+                onPressed: loading ? null : _handleActionButton,
                 child: Row(
                   children: [
                     Text((index == 0 ? widget.actionLabel : widget.confirmLabel) ?? ''),
@@ -155,7 +168,7 @@ class WorkflowState<TState> extends State<Workflow<TState>> {
                     },
                     steps: items.map((item) => Step(
                         title: Text(item.title),
-                        content: item,
+                        content: loading && items.indexOf(item) == items.length - 1 ? _LoadingStep() : item,
                         state: StepState.indexed,
                         isActive: item == items[index]
                     )).toList()
@@ -166,5 +179,26 @@ class WorkflowState<TState> extends State<Workflow<TState>> {
       )
     );
   }
+}
 
+class _LoadingStep extends WorkflowItem {
+  @override
+  Widget build(context) => Column(
+    children: [
+      Text('Please Wait',
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 16,
+        )
+      ),
+      SizedBox(height: 16),
+      Text('Sending money to Tigo Pesa 0713 898493'),
+      SizedBox(height: 32),
+      CircularProgressIndicator(
+        backgroundColor: Theme.of(context).primaryColor,
+      )
+    ],
+  );
+
+  String get title => 'Confirm';
 }
