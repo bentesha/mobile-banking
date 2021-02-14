@@ -23,17 +23,13 @@ class DrawerMenu extends StatelessWidget {
           buildItem(Icons.comment_bank, 'Standing Order', ActionType.standingOrder),
           buildItem(Icons.credit_card, 'Request ATM Card', ActionType.requestAtmCard),
           buildItem(Icons.book_outlined, 'Request Cheque Book', ActionType.requestChequeBook),
-          buildItem(Icons.perm_device_info, 'My Devices', ActionType.myDevices),
-          buildItem(Icons.lock_outline_rounded, 'Change PIN', ActionType.changePin),
-          buildItem(Icons.logout, 'Logout', ActionType.logout),
         ],
       ),
     );
   }
 
   Widget buildHeader() {
-    return Container(
-        height: 176,
+    return Ink(
         decoration: BoxDecoration(
             gradient: LinearGradient(
                 begin: Alignment.bottomLeft,
@@ -50,37 +46,71 @@ class DrawerMenu extends StatelessWidget {
                 colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.08), BlendMode.dstATop)
             )
         ),
-        child: Center(
-            child: Consumer<LoginService>(
-              builder: (context, loginService, _) {
-                final user = loginService.currentUser;
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    CircleAvatar(
-                      backgroundImage: AssetImage('assets/mkcb_logo.png'),
-                      backgroundColor: Colors.white,
-                      radius: 36,
+        child: Padding(
+          padding: EdgeInsets.only(top: 32),
+          child: Consumer<LoginService>(
+            builder: (context, loginService, _) {
+              final user = loginService.currentUser;
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircleAvatar(
+                    backgroundImage: AssetImage('assets/mkcb_logo.png'),
+                    backgroundColor: Colors.white,
+                    radius: 36,
+                  ),
+                  SizedBox(height: 16),
+                  InkWell(
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      if (onAction != null) {
+                        onAction(ActionType.profile);
+                      }
+                    },
+                    child:
+                    Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            backgroundColor: Colors.white,
+                            child: Text(user.name[0].toUpperCase(),
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                              )
+                            )
+                          ),
+                          SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(user.name,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white
+                                  )
+                                ),
+                                Text('+' + user.mobile,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14
+                                  )
+                                )
+                              ],
+                            ),
+                          ),
+                          Icon(Icons.chevron_right, color: Colors.white)
+                        ],
+                      ),
                     ),
-                    SizedBox(height: 16),
-                    Text(user.name,
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white
-                        )
-                    ),
-                    SizedBox(height: 8),
-                    Text(user.mobile,
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16
-                        )
-                    )
-                  ],
-                );
-              },
-            )
+                  )
+                ],
+              );
+            },
+          )
         )
     );
   }
@@ -117,7 +147,5 @@ enum ActionType {
   standingOrder,
   requestAtmCard,
   requestChequeBook,
-  myDevices,
-  changePin,
-  logout
+  profile
 }

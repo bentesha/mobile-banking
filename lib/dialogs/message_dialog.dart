@@ -8,7 +8,7 @@ class MessageDialog {
       context: context,
       builder: (context) => AlertDialog(
         title: title == null ? null : Text(title),
-        content: Text(message),
+        content: Text(message ?? ''),
         actions: [
           FlatButton(
             onPressed: () {

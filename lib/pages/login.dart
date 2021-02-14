@@ -2,9 +2,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mkombozi_mobile/decorations/primary_background_gradient.dart';
+import 'package:mkombozi_mobile/dialogs/message_dialog.dart';
 import 'package:mkombozi_mobile/networking/config_request.dart';
 import 'package:mkombozi_mobile/networking/login_request.dart';
+import 'package:mkombozi_mobile/pages/home.dart';
 import 'package:mkombozi_mobile/services/login_service.dart';
+import 'package:mkombozi_mobile/widgets/pin_code_input.dart';
 import 'package:provider/provider.dart';
 
 class LoginPage extends StatefulWidget {
@@ -20,39 +24,101 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
 
-  bool loading = false;
+  bool _loading = false;
+
+  _handlePinComplete(String pin) async {
+    final loginService = Provider.of<LoginService>(context, listen: false);
+    setState(() {
+      _loading = true;
+    });
+    final response = await loginService.login(pin);
+    if (response.code == 200) {
+      return Navigator.of(context).pushNamedAndRemoveUntil(HomePage.routeName, (route) => false);
+    } else if (response.code == 100) {
+      MessageDialog.show(context,
+          'Sorry, we could not authenticate you. Please make sure you are using a valid PIN',
+          'Authentication Failed'
+      );
+    } else {
+      MessageDialog.show(context,
+        response.description,
+        response.message
+      );
+    }
+    setState(() {
+      _loading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Center(
-          child: Column(
-            children: [
-              TextField(
-                decoration: InputDecoration(
-                  hintText: 'Enter PIN'
-                ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                gradient: PrimaryBackgroundGradient()
               ),
-              SizedBox(height: 8),
-              ElevatedButton(
-                onPressed: () async {
-                  final loginService = Provider.of<LoginService>(context, listen: false);
-                  setState(() {
-                    loading = true;
-                  });
-                  final response = await loginService.login('8270');
-                  setState(() {
-                    loading = false;
-                  });
-                },
-                child: Text(loading ? 'Loading...' : 'LOGIN'),
+              child: Consumer<LoginService>(
+                builder: (context, loginService, _) {
+                  final user = loginService.currentUser;
+                  return Column(
+                    children: [
+                      SizedBox(height: 72),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle
+                        ),
+                        child: Padding(
+                          padding: EdgeInsets.all(8),
+                          child: Image.asset('assets/mkcb_logo.png', height: 100, width: 100)
+                        )
+                      ),
+                      SizedBox(height: 32),
+                      Text('Hello!',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.white
+                        )
+                      ),
+                      SizedBox(height: 8),
+                      Text(user?.name ?? '',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold
+                        )
+                      ),
+                      SizedBox(height: 32),
+                      Text('Enter your PIN to continue',
+                        style: TextStyle(
+                          color: Colors.white
+                        )
+                      ),
+                      SizedBox(height: 32),
+                    ],
+                  );
+                }
               )
-            ],
-          )
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: 32),
+              child: _loading
+                ? CircularProgressIndicator()
+                : SizedBox(
+                width: 200,
+                child: PinCodeInput(
+                  onChanged: (value) {},
+                  onCompleted: _handlePinComplete,
+                )
+              )
+            )
+          ]
         )
       ),
     );
   }
-
 }

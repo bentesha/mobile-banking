@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 
 class ConfirmDialog {
 
-  static Future<bool> show(BuildContext context, String title, String message) {
+  static Future<bool> show(BuildContext context, String title, String message,
+      {String okText, String cancelText}) {
     return showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
@@ -14,13 +15,13 @@ class ConfirmDialog {
               onPressed: () {
                 Navigator.of(context).pop(false);
               },
-              child: Text('CANCEL')
+              child: Text(cancelText ?? 'CANCEL')
             ),
             FlatButton(
                 onPressed: () {
                   Navigator.of(context).pop(true);
                 },
-                child: Text('OK')
+                child: Text(okText ?? 'OK')
             )
           ],
         )

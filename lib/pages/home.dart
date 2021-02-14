@@ -3,15 +3,24 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:mkombozi_mobile/decorations/primary_background_gradient.dart';
 import 'package:mkombozi_mobile/models/account.dart';
 import 'package:mkombozi_mobile/models/service.dart';
 import 'package:mkombozi_mobile/pages/account_statement_page.dart';
+import 'package:mkombozi_mobile/pages/agency_withdrawal_page.dart';
+import 'package:mkombozi_mobile/pages/atm_card_request_page.dart';
 import 'package:mkombozi_mobile/pages/bill_payment.dart';
-import 'package:mkombozi_mobile/pages/cash_out_page.dart';
+import 'package:mkombozi_mobile/pages/atm_withdrawal_page.dart';
+import 'package:mkombozi_mobile/pages/cheque_book_request_page.dart';
+import 'package:mkombozi_mobile/pages/loan_application_page.dart';
+import 'package:mkombozi_mobile/pages/luku_token_list.dart';
+import 'package:mkombozi_mobile/pages/profile_page.dart';
+import 'package:mkombozi_mobile/pages/salary_advance_page.dart';
 import 'package:mkombozi_mobile/pages/select_destination_account.dart';
 import 'package:mkombozi_mobile/pages/select_service.dart';
 import 'package:mkombozi_mobile/pages/select_cash_out_method.dart';
 import 'package:mkombozi_mobile/pages/send_money_page.dart';
+import 'package:mkombozi_mobile/pages/standing_order_page.dart';
 import 'package:mkombozi_mobile/services/account_service.dart';
 import 'package:mkombozi_mobile/widgets/account_card.dart';
 import 'package:mkombozi_mobile/widgets/drawer_menu.dart';
@@ -29,6 +38,7 @@ class HomePage extends StatefulWidget {
 
   @override
   _HomePageState createState() => _HomePageState();
+
 }
 
 class _HomePageState extends State<HomePage> {
@@ -37,9 +47,9 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarColor: Color(0xff072d52), //or set color with: Color(0xFF0000FF)
-    ));
+    // SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    //   statusBarColor: Color(0xff072d52), //or set color with: Color(0xFF0000FF)
+    // ));
 
     return Scaffold(
       drawer: DrawerMenu(onAction: _handleDrawerMenuAction),
@@ -64,11 +74,32 @@ class _HomePageState extends State<HomePage> {
       return;
     }
     switch(action) {
+      case ActionType.profile:
+        ProfilePage.navigateTo(context, currentAccount);
+        break;
       case ActionType.miniStatement:
         AccountStatementPage.navigateTo(context, StatementType.mini, currentAccount);
         break;
       case ActionType.fullStatement:
         AccountStatementPage.navigateTo(context, StatementType.full, currentAccount);
+        break;
+      case ActionType.lukuTokens:
+        LukuTokenListPage.navigateTo(context, currentAccount);
+        break;
+      case ActionType.standingOrder:
+        StandingOrderPage.navigateTo(context, currentAccount);
+        break;
+      case ActionType.salaryAdvance:
+        SalaryAdvancePage.navigateTo(context, currentAccount);
+        break;
+      case ActionType.requestAtmCard:
+        AtmCardRequestPage.navigateTo(context, currentAccount);
+        break;
+      case ActionType.requestChequeBook:
+        ChequeBookRequestPage.navigateTo(context, currentAccount);
+        break;
+      case ActionType.loanApplication:
+        LoanApplicationPage.navigateTo(context, currentAccount);
         break;
       default:
     }
@@ -124,21 +155,20 @@ class ServiceTile extends StatelessWidget {
       onTap: onPressed,
       child: ListTile(
         leading: Container(
-            height: double.infinity,
-            child: icon
+          height: double.infinity,
+          child: icon
         ),
         title: Text(name,
-            style: TextStyle(
-                fontSize: 14,
-                color: Colors.blue.shade800,
-                fontWeight: FontWeight.w500
-            )
+          style: TextStyle(
+            fontSize: 14,
+            color: Colors.blue.shade800,
+            fontWeight: FontWeight.w500
+          )
         ),
         subtitle: Text(description,
-            style: TextStyle(
-              fontSize: 12,
-
-            )
+          style: TextStyle(
+            fontSize: 12,
+          )
         ),
       )
     );
@@ -154,38 +184,30 @@ class Header extends StatelessWidget {
   build(context) {
     return Container(
       decoration: BoxDecoration(
-          gradient: LinearGradient(
-              begin: Alignment.bottomLeft,
-              end: Alignment.topRight,
-              colors: [
-                Color(0xff0a3057),
-                Color(0xff338ef9),
-                Color(0xff0a3057),
-              ]
-          )
+        gradient: PrimaryBackgroundGradient()
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           SizedBox(
-              height: 56,
-              child: AppBar(
-                leading: IconButton(
-                  onPressed: () {
-                    Scaffold.of(context).openDrawer();
-                  },
-                  icon: Icon(Icons.menu),
-                ),
-                title: Text('MKOMBOZI Bank',
-                  style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16
-                  )
-                ),
-                centerTitle: true,
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-              )
+            height: 56,
+            child: AppBar(
+              leading: IconButton(
+                onPressed: () {
+                  Scaffold.of(context).openDrawer();
+                },
+                icon: Icon(Icons.menu),
+              ),
+              title: Text('MKOMBOZI Bank',
+                style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16
+                )
+              ),
+              centerTitle: true,
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+            )
           ),
           Padding(
             padding: EdgeInsets.only(bottom: 32),
@@ -201,17 +223,17 @@ class Header extends StatelessWidget {
                       onChanged(snapshot.data.first);
                     }
                     return CarouselSlider(
-                        options: CarouselOptions(
-                          viewportFraction: 0.8,
-                          enableInfiniteScroll: false,
-                          onPageChanged: (index, _) {
-                            if (onChanged == null) {
-                              return;
-                            }
-                            onChanged(snapshot.data[index]);
+                      options: CarouselOptions(
+                        viewportFraction: 0.8,
+                        enableInfiniteScroll: false,
+                        onPageChanged: (index, _) {
+                          if (onChanged == null) {
+                            return;
                           }
-                        ),
-                        items: snapshot.data.map((account) => AccountCard(account: account)).toList()
+                          onChanged(snapshot.data[index]);
+                        }
+                      ),
+                      items: snapshot.data.map((account) => AccountCard(account: account)).toList()
                     );
                   },
                 );
@@ -249,10 +271,16 @@ class ActionBar extends StatelessWidget {
         SendMoneyPage.navigateTo(context, _getCurrentAccount(context), walletOrBank);
       } else if (index == 2) {
         final method = await SelectWithdrawalMethodPage.navigateTo(context);
-        if (method == null) {
-          return;
+        switch(method){
+          case CashOutMethod.atm:
+            AtmWithdrawalPage.navigateTo(context, _getCurrentAccount(context));
+            break;
+          case CashOutMethod.agent:
+            AgencyWithdrawalPage.navigateTo(context, _getCurrentAccount(context));
+            break;
+          default:
+            return;
         }
-        CashOutPage.navigateTo(context, _getCurrentAccount(context), method);
       }
     }
 
@@ -260,48 +288,47 @@ class ActionBar extends StatelessWidget {
       padding: EdgeInsets.symmetric(vertical: 8),
       color: Color(0xff086086),
       child: BottomNavigationBar(
-          onTap: _handleActionButton,
-          elevation: 0,
-          selectedItemColor: Color(0xffa3cc55),
-          unselectedItemColor: Color(0xffa3cc55),
-          backgroundColor: Colors.transparent,
-          selectedLabelStyle: TextStyle(
-            fontWeight: FontWeight.w700,
-            fontSize: 12,
-          ),
-          unselectedLabelStyle: TextStyle(
-            fontWeight: FontWeight.w700,
-            fontSize: 12,
-          ),
-          items: [
-            BottomNavigationBarItem(
-                icon: Padding(
-                  padding: EdgeInsets.only(bottom: 8),
-                  child: Icon(Icons.account_balance_wallet_outlined),
-                ),
-                label: 'PAY BILL'
+        onTap: _handleActionButton,
+        elevation: 0,
+        selectedItemColor: Color(0xffa3cc55),
+        unselectedItemColor: Color(0xffa3cc55),
+        backgroundColor: Colors.transparent,
+        selectedLabelStyle: TextStyle(
+          fontWeight: FontWeight.w700,
+          fontSize: 12,
+        ),
+        unselectedLabelStyle: TextStyle(
+          fontWeight: FontWeight.w700,
+          fontSize: 12,
+        ),
+        items: [
+          BottomNavigationBarItem(
+            icon: Padding(
+              padding: EdgeInsets.only(bottom: 8),
+              child: Icon(Icons.account_balance_wallet_outlined),
             ),
-            BottomNavigationBarItem(
-                icon: Padding(
-                  padding: EdgeInsets.only(bottom: 8),
-                  child: Icon(Icons.login),
-                ),
-                label: 'SEND MONEY'
+            label: 'PAY BILL'
+          ),
+          BottomNavigationBarItem(
+            icon: Padding(
+              padding: EdgeInsets.only(bottom: 8),
+              child: Icon(Icons.login),
             ),
-            BottomNavigationBarItem(
-                icon: Padding(
-                  padding: EdgeInsets.only(bottom: 8),
-                  child: SvgPicture.asset('assets/cash-out.svg',
-                    height: 24,
-                    width: 24,
-                    color: Theme.of(context).accentColor
-                  ),
-                ),
-                label: 'CASH OUT'
-            )
-          ]
+            label: 'SEND MONEY'
+          ),
+          BottomNavigationBarItem(
+            icon: Padding(
+              padding: EdgeInsets.only(bottom: 8),
+              child: SvgPicture.asset('assets/cash-out.svg',
+                height: 24,
+                width: 24,
+                color: Theme.of(context).accentColor
+              ),
+            ),
+            label: 'CASH OUT'
+          )
+        ]
       ),
     );
   }
-
 }

@@ -1,6 +1,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:mkombozi_mobile/data/offline_database.dart';
+import 'package:mkombozi_mobile/models/device.dart';
 import 'package:mkombozi_mobile/models/service.dart';
 import 'package:mkombozi_mobile/models/user.dart';
 import 'package:mkombozi_mobile/networking/config_request.dart';
@@ -53,5 +54,9 @@ class LoginService {
     await _db.saveWallets([]);
     await _db.saveServices([]);
     await _db.saveBanks([]);
+  }
+
+  Future<List<Device>> getDevices() {
+    return _db.getDevices();
   }
 }
