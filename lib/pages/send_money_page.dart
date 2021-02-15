@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:mkombozi_mobile/dialogs/message_dialog.dart';
 import 'package:mkombozi_mobile/dialogs/pin_code_dialog.dart';
 import 'package:mkombozi_mobile/formatters/decimal_input_formatter.dart';
-import 'package:mkombozi_mobile/helpers/formatters.dart';
 import 'package:mkombozi_mobile/helpers/utils.dart';
 import 'package:mkombozi_mobile/models/account.dart';
 import 'package:mkombozi_mobile/models/wallet_or_bank.dart';
@@ -68,7 +67,7 @@ class _StepOne extends WorkflowItem {
     }
 
     if (message != null) {
-      MessageDialog.show(context, message);
+      MessageDialog.showFormError(context: context, message: message);
     }
 
     return message == null;
@@ -166,12 +165,15 @@ class _StepTwo extends WorkflowItem {
       final title = 'Money Sent';
       final message =
           '${Utils.stringToDouble(_data.amount)} was sent to ${_data.referenceNumber}';
-      await MessageDialog.show(context, message, title);
+      await MessageDialog.show(
+          context: context, message: message, title: title);
       return true;
     }
 
     await MessageDialog.show(
-        context, response.message, 'Sending Payment Failed!');
+        context: context,
+        message: response.description,
+        title: response.message);
     return false;
   }
 

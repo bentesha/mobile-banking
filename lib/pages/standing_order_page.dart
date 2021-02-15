@@ -73,7 +73,7 @@ class _StepOne extends WorkflowItem {
     }
 
     if (message != null) {
-      MessageDialog.show(context, message);
+      MessageDialog.showFormError(context: context, message: message);
     }
 
     return message == null;
@@ -178,11 +178,16 @@ class _StepTwo extends WorkflowItem {
     final response = await request.send();
     if (response.code == 200) {
       await MessageDialog.show(
-          context, 'Standing order was successfully set', 'Success');
+          context: context,
+          message: 'Standing order was successfully set',
+          title: 'Success');
       return true;
     }
 
-    await MessageDialog.show(context, response.description, response.message);
+    await MessageDialog.show(
+        context: context,
+        message: response.description,
+        title: response.message);
     return false;
   }
 

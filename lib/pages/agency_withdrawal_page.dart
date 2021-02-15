@@ -62,7 +62,8 @@ class _StepOne extends WorkflowItem {
     }
 
     if (message != null) {
-      MessageDialog.show(context, message, 'Form Error');
+      MessageDialog.show(
+          context: context, message: message, title: 'Form Error');
     }
 
     if (message != null) {
@@ -79,9 +80,10 @@ class _StepOne extends WorkflowItem {
     final response = await request.send();
     if (response.agent == null) {
       MessageDialog.show(
-          context,
-          'Agent with number "${_data.agentNumber}" could not be found.',
-          'Agent Not Found');
+          context: context,
+          message:
+              'Agent with number "${_data.agentNumber}" could not be found.',
+          title: 'Agent Not Found');
       return false;
     }
 
@@ -143,14 +145,17 @@ class _StepTwo extends WorkflowItem {
     final response = await request.send();
     if (response.code == 200) {
       await MessageDialog.show(
-        context,
-        'Transaction has been completed successfully',
-        'Transaction Complete',
+        context: context,
+        message: 'Transaction has been completed successfully',
+        title: 'Transaction Complete',
       );
       return true;
     }
 
-    MessageDialog.show(context, response.description, response.message);
+    MessageDialog.show(
+        context: context,
+        message: response.description,
+        title: response.message);
     return false;
   }
 

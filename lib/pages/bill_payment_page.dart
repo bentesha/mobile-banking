@@ -65,7 +65,7 @@ class _StepOne extends WorkflowItem {
     }
 
     if (message != null) {
-      MessageDialog.show(context, message);
+      MessageDialog.showFormError(context: context, message: message);
     }
 
     return message == null;
@@ -77,10 +77,10 @@ class _StepOne extends WorkflowItem {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ServiceSelector(
-          label: 'Send payment to',
-          icon: Icon(Icons.account_balance_wallet_outlined),
-          service: _data.service,
-          onChanged: (value) => _data.service = value),
+            label: 'Send payment to',
+            icon: Icon(Icons.account_balance_wallet_outlined),
+            service: _data.service,
+            onChanged: (value) => _data.service = value),
         FormCellDivider(height: 32),
         AccountSelector(
           label: 'Pay from account',
@@ -89,11 +89,11 @@ class _StepOne extends WorkflowItem {
         ),
         FormCellDivider(),
         FormCellInput(
-          onChanged: (value) => _data.referenceNumber = value,
-          label: 'Reference Number',
-          hintText: 'Enter reference number',
-          initialValue: _data.referenceNumber,
-          icon: Icon(Icons.money)),
+            onChanged: (value) => _data.referenceNumber = value,
+            label: 'Reference Number',
+            hintText: 'Enter reference number',
+            initialValue: _data.referenceNumber,
+            icon: Icon(Icons.money)),
         FormCellDivider(),
         FormCellInput(
           label: 'Amount to pay',
@@ -144,11 +144,15 @@ class _StepTwo extends WorkflowItem {
     if (response.code == 200) {
       String message =
           '${Formatter.formatCurrency(amount)} success sent to ${_data.service.name}';
-      await MessageDialog.show(context, message, 'Success');
+      await MessageDialog.show(
+          context: context, message: message, title: 'Success');
       return true;
     }
 
-    await MessageDialog.show(context, response.message, 'Failed');
+    await MessageDialog.show(
+        context: context,
+        message: response.description,
+        title: response.message);
     return false;
   }
 

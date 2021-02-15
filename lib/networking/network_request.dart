@@ -50,14 +50,16 @@ abstract class NetworkRequest<T extends NetworkResponse> {
       print(e);
       final response = {
         'code': 500,
-        'message': 'Please check your data connection or retry again later.'
+        'message': 'Network Error',
+        'description': 'Please check your data connection or retry again later.'
       };
       return createResponse({ 'response': response });
     } on TimeoutException catch(e) {
       print(e);
       final response = {
         'code': 500,
-        'message': 'Please check your data connection or retry again later.'
+        'message': 'Device Offline',
+        'description': 'Please check your data connection or retry again later.'
       };
       return createResponse({ 'response': response });
     } on FormatException catch(e) {
@@ -65,7 +67,8 @@ abstract class NetworkRequest<T extends NetworkResponse> {
       print(e);
       final response = {
         'code': 500,
-        'message': 'Unknown server error. Please retry again shortly!'
+        'message': 'Server Error',
+        'description': 'Unknown server error. Please retry again shortly!'
       };
       return createResponse({ 'response': response });
     } finally {

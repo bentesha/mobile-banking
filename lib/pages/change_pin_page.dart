@@ -62,16 +62,16 @@ class _PageState extends State<ChangePinPage> {
   _changePin() async {
     if (steps[1].pin != steps[2].pin) {
       MessageDialog.show(
-        context,
-        'You must re-enter your new PIN to confirm',
-        'PIN Mismatch'
+        context: context,
+        message: 'You must re-enter your new PIN to confirm',
+        title: 'PIN Mismatch'
       );
       return _moveBy(-1);
     } else if (steps[0].pin == steps[1].pin) {
       MessageDialog.show(
-        context,
-        'To renew your PIN, your new PIN must be different from the current one',
-        'Identical PINs'
+        context: context,
+        message: 'To renew your PIN, your new PIN must be different from the current one',
+        title: 'Identical PINs'
       );
       return _moveBy(-1);
     }
@@ -90,24 +90,24 @@ class _PageState extends State<ChangePinPage> {
     final response = await request.send();
     if (response.code == 200) {
       await MessageDialog.show(
-        context,
-        'You will be prompted to log in with your new PIN.',
-        'PIN Changed Successfully'
+        context: context,
+        message: 'You will be prompted to log in with your new PIN.',
+        title: 'PIN Changed Successfully'
       );
       await loginService.logout();
       Navigator.of(context).pushNamedAndRemoveUntil(MyApp.START_PAGE, (route) => false);
     } else if (response.code == 100) {
       MessageDialog.show(
-        context,
-        'The PIN your provided was not valid. Please retry with the correct PIN.',
-        'PIN Not Changed'
+        context: context,
+        message: 'The PIN your provided was not valid. Please retry with the correct PIN.',
+        title: 'PIN Not Changed'
       );
       _moveBy(-2);
     } else {
       MessageDialog.show(
-        context,
-        response.description,
-        response.message
+        context: context,
+        message: response.description,
+        title: response.message
       );
       _moveBy(-2);
     }

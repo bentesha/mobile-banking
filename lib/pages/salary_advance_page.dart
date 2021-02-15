@@ -59,7 +59,7 @@ class _StepOne extends WorkflowItem {
     }
 
     if (message != null) {
-      MessageDialog.show(context, message);
+      MessageDialog.showFormError(context: context, message: message);
     }
 
     return message == null;
@@ -77,24 +77,24 @@ class _StepOne extends WorkflowItem {
         ),
         FormCellDivider(),
         FormCellInput(
-          onChanged: (value) => _data.netSalary = value,
-          label: 'Net Salary',
-          inputFormatters: [DecimalInputFormatter()],
-          hintText: 'Your net salary amount',
-          inputType: TextInputType.number,
-          textAlign: TextAlign.right,
-          initialValue: _data.netSalary,
-          icon: Icon(Icons.attach_money)),
+            onChanged: (value) => _data.netSalary = value,
+            label: 'Net Salary',
+            inputFormatters: [DecimalInputFormatter()],
+            hintText: 'Your net salary amount',
+            inputType: TextInputType.number,
+            textAlign: TextAlign.right,
+            initialValue: _data.netSalary,
+            icon: Icon(Icons.attach_money)),
         FormCellDivider(),
         FormCellInput(
-          onChanged: (value) => _data.amount = value,
-          inputFormatters: [DecimalInputFormatter()],
-          label: 'Advance Amount',
-          hintText: 'Requested salary advance amount',
-          inputType: TextInputType.number,
-          textAlign: TextAlign.right,
-          initialValue: _data.amount,
-          icon: Icon(Icons.attach_money)),
+            onChanged: (value) => _data.amount = value,
+            inputFormatters: [DecimalInputFormatter()],
+            label: 'Advance Amount',
+            hintText: 'Requested salary advance amount',
+            inputType: TextInputType.number,
+            textAlign: TextAlign.right,
+            initialValue: _data.amount,
+            icon: Icon(Icons.attach_money)),
       ],
     );
   }
@@ -122,11 +122,16 @@ class _StepTwo extends WorkflowItem {
     final response = await request.send();
     if (response.code == 200) {
       await MessageDialog.show(
-          context, 'Your salary advance request has been submitted', 'Success');
+          context: context,
+          message: 'Your salary advance request has been submitted',
+          title: 'Success');
       return true;
     }
 
-    await MessageDialog.show(context, response.description, response.message);
+    await MessageDialog.show(
+        context: context,
+        message: response.description,
+        title: response.message);
     return false;
   }
 

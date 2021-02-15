@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:mkombozi_mobile/dialogs/message_dialog.dart';
 import 'package:mkombozi_mobile/dialogs/pin_code_dialog.dart';
@@ -9,7 +8,6 @@ import 'package:mkombozi_mobile/services/login_service.dart';
 import 'package:provider/provider.dart';
 
 class AccountCard extends StatelessWidget {
-
   AccountCard({Key key, @required this.account});
 
   final Account account;
@@ -17,13 +15,11 @@ class AccountCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12)
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         clipBehavior: Clip.antiAliasWithSaveLayer,
         elevation: 6,
         child: Container(
-          // height: 176,
+            // height: 176,
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -33,13 +29,12 @@ class AccountCard extends StatelessWidget {
                     Color(0xff009de4),
                     Color(0xff2170b5),
                     Color(0xff049bde),
-                  ]
-              ),
+                  ]),
               image: DecorationImage(
                   image: AssetImage('assets/card_background.png'),
                   fit: BoxFit.fill,
-                  colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.08), BlendMode.dstATop)
-              ),
+                  colorFilter: ColorFilter.mode(
+                      Colors.black.withOpacity(0.08), BlendMode.dstATop)),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -70,16 +65,10 @@ class AccountCard extends StatelessWidget {
                             fontSize: 12,
                             color: Colors.white.withOpacity(0.7),
                           ),
-                          textAlign: TextAlign.end
-                      ),
+                          textAlign: TextAlign.end),
                       Text(Formatter.maskAccountNumber(account.accountNumber),
-                          style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.white
-                          )
-                      )
-                    ]
-                ),
+                          style: TextStyle(fontSize: 18, color: Colors.white))
+                    ]),
                 SizedBox(height: 8),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -94,38 +83,28 @@ class AccountCard extends StatelessWidget {
                                 fontSize: 12,
                                 color: Colors.white.withOpacity(0.7),
                               ),
-                              textAlign: TextAlign.end
-                          ),
+                              textAlign: TextAlign.end),
                           Text(account.name,
-                              style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.white
-                              )
-                          )
-                        ]
-                    ),
+                              style:
+                                  TextStyle(fontSize: 14, color: Colors.white))
+                        ]),
                     Image.asset('assets/visa_white.png', height: 10)
                   ],
                 )
               ],
-            )
-        )
-    );
+            )));
   }
 }
 
 class _AccountBalance extends StatefulWidget {
-
   final Account account;
 
-  _AccountBalance({@required this.account });
+  _AccountBalance({@required this.account});
 
   createState() => _AccountBalanceState();
-
 }
 
 class _AccountBalanceState extends State<_AccountBalance> {
-
   var balance = 'Tap to view balance';
   var loading = false;
 
@@ -147,7 +126,10 @@ class _AccountBalanceState extends State<_AccountBalance> {
         balance = Formatter.formatCurrency(response.balance);
       });
     } else {
-      MessageDialog.show(context, response.message);
+      MessageDialog.show(
+          context: context,
+          title: response.message,
+          message: response.description);
     }
     setState(() {
       loading = false;
@@ -165,22 +147,14 @@ class _AccountBalanceState extends State<_AccountBalance> {
                 fontSize: 12,
                 color: Colors.white.withOpacity(0.7),
               ),
-              textAlign: TextAlign.end
-          ),
-          loading ?
-              SizedBox(
-                width: 80,
-                child: LinearProgressIndicator(value: null)
-              ) :
-              Text(balance,
-                style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.white
-              )
-          )
+              textAlign: TextAlign.end),
+          loading
+              ? SizedBox(width: 80, child: LinearProgressIndicator(value: null))
+              : Text(balance,
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white))
         ],
-      )
-  );
-
+      ));
 }

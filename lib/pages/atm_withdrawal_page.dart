@@ -62,7 +62,7 @@ class _StepOne extends WorkflowItem {
     }
 
     if (message != null) {
-      MessageDialog.show(context, message);
+      MessageDialog.showFormError(context: context, message: message);
     }
 
     return message == null;
@@ -80,13 +80,13 @@ class _StepOne extends WorkflowItem {
         ),
         FormCellDivider(),
         FormCellInput(
-          onChanged: (value) => _data.recipientMobile = value,
-          inputFormatters: [NumberInputFormatter(length: 12)],
-          label: 'Mobile Number',
-          hintText: 'Enter phone number',
-          inputType: TextInputType.number,
-          initialValue: _data.recipientMobile,
-          icon: Icon(Icons.money)),
+            onChanged: (value) => _data.recipientMobile = value,
+            inputFormatters: [NumberInputFormatter(length: 12)],
+            label: 'Mobile Number',
+            hintText: 'Enter phone number',
+            inputType: TextInputType.number,
+            initialValue: _data.recipientMobile,
+            icon: Icon(Icons.money)),
         FormCellDivider(),
         FormCellInput(
           label: 'Amount',
@@ -131,12 +131,17 @@ class _StepTwo extends WorkflowItem {
         amount: Utils.stringToDouble(_data.amount));
     final response = await request.send();
     if (response.code == 200) {
-      await MessageDialog.show(context,
-          'Transaction was successfully completed', 'Transaction Completed');
+      await MessageDialog.show(
+          context: context,
+          message: 'Transaction was successfully completed',
+          title: 'Transaction Completed');
       return true;
     }
 
-    MessageDialog.show(context, response.description, response.message);
+    MessageDialog.show(
+        context: context,
+        message: response.description,
+        title: response.message);
     return false;
   }
 
