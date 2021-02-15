@@ -1,22 +1,18 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mkombozi_mobile/dialogs/message_dialog.dart';
 import 'package:mkombozi_mobile/dialogs/pin_code_dialog.dart';
+import 'package:mkombozi_mobile/formatters/decimal_input_formatter.dart';
+import 'package:mkombozi_mobile/formatters/number_input_formatter.dart';
 import 'package:mkombozi_mobile/helpers/utils.dart';
 import 'package:mkombozi_mobile/models/account.dart';
 import 'package:mkombozi_mobile/models/agent.dart';
-import 'package:mkombozi_mobile/models/wallet_or_bank.dart';
 import 'package:mkombozi_mobile/networking/agency_withdrawal_request.dart';
 import 'package:mkombozi_mobile/networking/resolve_agent_request.dart';
-import 'package:mkombozi_mobile/pages/select_cash_out_method.dart';
 import 'package:mkombozi_mobile/services/login_service.dart';
 import 'package:mkombozi_mobile/widgets/account_selector.dart';
-import 'package:mkombozi_mobile/widgets/cash_out_method_selector.dart';
 import 'package:mkombozi_mobile/widgets/form_cell_divider.dart';
 import 'package:mkombozi_mobile/widgets/form_cell_input.dart';
 import 'package:mkombozi_mobile/widgets/label_value_cell.dart';
-import 'package:mkombozi_mobile/widgets/wallet_or_bank_selector.dart';
 import 'package:mkombozi_mobile/widgets/workflow.dart';
 import 'package:mkombozi_mobile/widgets/workflow_item.dart';
 import 'package:provider/provider.dart';
@@ -31,9 +27,9 @@ class AgencyWithdrawalPage extends Workflow<_FormData> {
 
   AgencyWithdrawalPage(this.account)
       : super(
-      title: 'Agency Withdrawal',
-      actionLabel: 'WITHDRAW',
-      confirmLabel: 'CONFIRM & WITHDRAW');
+            title: 'Agency Withdrawal',
+            actionLabel: 'WITHDRAW',
+            confirmLabel: 'CONFIRM & WITHDRAW');
 
   @override
   _FormData createWorkflowState() => _FormData(account);
@@ -73,31 +69,19 @@ class _StepOne extends WorkflowItem {
       return false;
     }
 
-    final agent = Agent();
-    agent.account = '1004';
-    agent.bankName = 'Mkombozi Bank';
-    agent.name = 'VICKY MSHANA';
-    agent.branchName = 'Tegeta';
-    _data.agent = agent;
-
-    return true;
-
     // If agent number has not changed, skip resolving agent information
     if (_data.agentNumber == _data.agent?.account) {
       return true;
     }
 
     final request = ResolveAgentRequest(
-        account: _data.account,
-        agentNumber: _data.agentNumber
-    );
+        account: _data.account, agentNumber: _data.agentNumber);
     final response = await request.send();
     if (response.agent == null) {
       MessageDialog.show(
           context,
           'Agent with number "${_data.agentNumber}" could not be found.',
-          'Agent Not Found'
-      );
+          'Agent Not Found');
       return false;
     }
 
@@ -117,6 +101,7 @@ class _StepOne extends WorkflowItem {
         FormCellDivider(),
         FormCellInput(
             onChanged: (value) => _data.agentNumber = value,
+            inputFormatters: [NumberInputFormatter(length: 5)],
             label: 'Agent Number',
             hintText: 'Enter agent number',
             initialValue: _data.agentNumber,
@@ -124,6 +109,7 @@ class _StepOne extends WorkflowItem {
         FormCellDivider(),
         FormCellInput(
           label: 'Amount',
+          inputFormatters: [DecimalInputFormatter()],
           initialValue: _data.amount?.toString(),
           onChanged: (value) => _data.amount = value,
           hintText: 'Enter amount e.g 20,000',
@@ -164,11 +150,7 @@ class _StepTwo extends WorkflowItem {
       return true;
     }
 
-    MessageDialog.show(
-      context,
-      response.description,
-      response.message
-    );
+    MessageDialog.show(context, response.description, response.message);
     return false;
   }
 
@@ -181,8 +163,7 @@ class _StepTwo extends WorkflowItem {
           SizedBox(width: 8),
           Flexible(
             child: Text('Please check and confirm details below',
-                style: Theme
-                    .of(context)
+                style: Theme.of(context)
                     .textTheme
                     .bodyText2
                     .copyWith(fontWeight: FontWeight.bold)),
@@ -191,7 +172,7 @@ class _StepTwo extends WorkflowItem {
         SizedBox(height: 32),
         Ink(
             decoration:
-            BoxDecoration(border: Border.all(color: Colors.grey.shade300)),
+                BoxDecoration(border: Border.all(color: Colors.grey.shade300)),
             child: Padding(
                 padding: EdgeInsets.all(16),
                 child: Column(
@@ -206,10 +187,7 @@ class _StepTwo extends WorkflowItem {
                           label: 'Agent Name', value: _data.agent.name),
                       LabelValueCell(
                           label: 'Agent Bank', value: _data.agent.bankName)
-                    ]
-                )
-            )
-        )
+                    ])))
       ],
     );
   }

@@ -2,7 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:mkombozi_mobile/dialogs/message_dialog.dart';
 import 'package:mkombozi_mobile/dialogs/pin_code_dialog.dart';
+import 'package:mkombozi_mobile/formatters/decimal_input_formatter.dart';
 import 'package:mkombozi_mobile/helpers/formatters.dart';
+import 'package:mkombozi_mobile/helpers/utils.dart';
 import 'package:mkombozi_mobile/models/account.dart';
 import 'package:mkombozi_mobile/models/wallet_or_bank.dart';
 import 'package:mkombozi_mobile/networking/send_money_request.dart';
@@ -28,9 +30,9 @@ class SendMoneyPage extends Workflow<_FormData> {
 
   SendMoneyPage(this.account, this.walletOrBank)
       : super(
-      title: 'Send Money',
-      actionLabel: 'SEND MONEY',
-      confirmLabel: 'CONFIRM & SEND MONEY');
+            title: 'Send Money',
+            actionLabel: 'SEND MONEY',
+            confirmLabel: 'CONFIRM & SEND MONEY');
 
   @override
   _FormData createWorkflowState() => _FormData(account, walletOrBank);
@@ -56,12 +58,13 @@ class _StepOne extends WorkflowItem {
 
     if (_data._account == null) {
       message = 'Account is required';
-    } else if (_data._walletOrBank == null) {
+    } else if (_data.walletOrBank == null) {
       message = 'Service is required';
-    } else if (_data._amount == null || _data.amount.isEmpty) {
+    } else if (_data.referenceNumber == null || _data.referenceNumber.isEmpty) {
+      final referenceName = _data.walletOrBank.isWallet ? 'phone' : 'account';
+      message = 'Enter $referenceName number';
+    } else if (_data.amount == null || _data.amount.isEmpty) {
       message = 'Enter amount';
-    } else if (_data._reference == null || _data.referenceNumber.isEmpty) {
-      message = 'Enter reference number';
     }
 
     if (message != null) {
@@ -76,60 +79,63 @@ class _StepOne extends WorkflowItem {
     // We need to update the widget tree if the wallet/bank changes
     final _notifier = ValueNotifier<WalletOrBank>(_data.walletOrBank);
     return ValueListenableBuilder(
-      valueListenable: _notifier,
-      builder: (context, _, __) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          WalletOrBankSelector(
-              label: _data.walletOrBank.isWallet ? 'Wallet' : 'Bank',
-              icon: Icon(_data.walletOrBank.isWallet
-                  ? Icons.account_balance_wallet_outlined
-                  : Icons.account_balance_sharp
-              ),
-              walletOrBank: _data.walletOrBank,
-              onChanged: (value) {
-                _data.walletOrBank = value;
-                // If bank/wallet changes, clear reference number
-                if (_notifier.value.bin != value.bin) {
-                  _data.referenceNumber = '';
-                }
-                _notifier.value = value;
-              }
-          ),
-          FormCellDivider(height: 32),
-          AccountSelector(
-            label: 'Pay from account',
-            value: _data.account,
-            onChanged: (value) => _data.account = value,
-          ),
-          FormCellDivider(),
-          FormCellInput(
-              onChanged: (value) => _data.referenceNumber = value,
-              label: _data.walletOrBank.isWallet ? 'Phone Number' : 'Account Number',
-              hintText: 'Enter ' + (_data._walletOrBank.isWallet ? 'phone number' : 'account number'),
-              initialValue: _data.referenceNumber,
-              icon: Icon(Icons.money)),
-          FormCellDivider(),
-          FormCellInput(
-            label: 'Amount',
-            initialValue: _data.amount?.toString(),
-            onChanged: (value) => _data.amount = value,
-            hintText: 'Enter amount to send. e.g 20,000',
-            inputType: TextInputType.number,
-            textAlign: TextAlign.right,
-            icon: Icon(Icons.attach_money),
-          ),
-          FormCellDivider(),
-          FormCellInput(
-            label: 'Reference',
-            initialValue: _data.reference,
-            onChanged: (value) => _data.reference = value,
-            hintText: 'For your reference',
-            icon: Icon(Icons.notes),
-          )
-        ],
-      )
-    );
+        valueListenable: _notifier,
+        builder: (context, _, __) => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                WalletOrBankSelector(
+                    label: _data.walletOrBank.isWallet ? 'Wallet' : 'Bank',
+                    icon: Icon(_data.walletOrBank.isWallet
+                        ? Icons.account_balance_wallet_outlined
+                        : Icons.account_balance_sharp),
+                    walletOrBank: _data.walletOrBank,
+                    onChanged: (value) {
+                      _data.walletOrBank = value;
+                      // If bank/wallet changes, clear reference number
+                      if (_notifier.value.bin != value.bin) {
+                        _data.referenceNumber = '';
+                      }
+                      _notifier.value = value;
+                    }),
+                FormCellDivider(height: 32),
+                AccountSelector(
+                  label: 'Pay from account',
+                  value: _data.account,
+                  onChanged: (value) => _data.account = value,
+                ),
+                FormCellDivider(),
+                FormCellInput(
+                    onChanged: (value) => _data.referenceNumber = value,
+                    label: _data.walletOrBank.isWallet
+                        ? 'Phone Number'
+                        : 'Account Number',
+                    hintText: 'Enter ' +
+                        (_data._walletOrBank.isWallet
+                            ? 'phone number'
+                            : 'account number'),
+                    initialValue: _data.referenceNumber,
+                    icon: Icon(Icons.money)),
+                FormCellDivider(),
+                FormCellInput(
+                  label: 'Amount',
+                  inputFormatters: [DecimalInputFormatter()],
+                  initialValue: _data.amount?.toString(),
+                  onChanged: (value) => _data.amount = value,
+                  hintText: 'Enter amount to send. e.g 20,000',
+                  inputType: TextInputType.number,
+                  textAlign: TextAlign.right,
+                  icon: Icon(Icons.attach_money),
+                ),
+                FormCellDivider(),
+                FormCellInput(
+                  label: 'Reference',
+                  initialValue: _data.reference,
+                  onChanged: (value) => _data.reference = value,
+                  hintText: 'For your reference',
+                  icon: Icon(Icons.notes),
+                )
+              ],
+            ));
   }
 }
 
@@ -152,19 +158,20 @@ class _StepTwo extends WorkflowItem {
     request.pin = pin;
     request.user = user.currentUser;
     request.referenceNumber = _data.referenceNumber;
-    final amount = double.parse(_data._amount.replaceAll(',', ''));
-    request.amount = amount;
-    request.reference = _data._reference;
+    request.amount = Utils.stringToDouble(_data.amount);
+    request.reference = _data._referenceNumber;
 
     final response = await request.send();
     if (response.code == 200) {
       final title = 'Money Sent';
-      final message = '${Formatter.formatCurrency(amount)} was sent to ${_data.referenceNumber}';
+      final message =
+          '${Utils.stringToDouble(_data.amount)} was sent to ${_data.referenceNumber}';
       await MessageDialog.show(context, message, title);
       return true;
     }
 
-    await MessageDialog.show(context, response.message, 'Sending Payment Failed!');
+    await MessageDialog.show(
+        context, response.message, 'Sending Payment Failed!');
     return false;
   }
 
@@ -186,7 +193,7 @@ class _StepTwo extends WorkflowItem {
         SizedBox(height: 32),
         Ink(
             decoration:
-            BoxDecoration(border: Border.all(color: Colors.grey.shade300)),
+                BoxDecoration(border: Border.all(color: Colors.grey.shade300)),
             child: Padding(
                 padding: EdgeInsets.all(16),
                 child: Column(
@@ -195,11 +202,15 @@ class _StepTwo extends WorkflowItem {
                       LabelValueCell(
                           label: 'Send to', value: _data.walletOrBank.name),
                       LabelValueCell(
-                          label: _data.walletOrBank.isWallet ? 'Phone number' : 'Account number', value: _data.referenceNumber),
+                          label: _data.walletOrBank.isWallet
+                              ? 'Phone number'
+                              : 'Account number',
+                          value: _data.referenceNumber),
                       LabelValueCell(
                           label: 'Pay from', value: _data.account.maskedNumber),
                       LabelValueCell(label: 'Amount', value: _data.amount),
-                      LabelValueCell(label: 'Reference', value: _data.reference),
+                      LabelValueCell(
+                          label: 'Reference', value: _data.reference),
                       LabelValueCell(label: 'Charges', value: '1,200.00')
                     ])))
       ],
@@ -214,8 +225,8 @@ class _FormData {
   WalletOrBank _walletOrBank;
   Account _account;
   String _amount;
+  String _referenceNumber;
   String _reference;
-  String _notes;
   bool isDirty = false;
 
   _FormData(this._account, this._walletOrBank);
@@ -241,17 +252,17 @@ class _FormData {
     _amount = value;
   }
 
-  String get referenceNumber => _reference;
+  String get referenceNumber => _referenceNumber;
 
   set referenceNumber(value) {
     isDirty = true;
-    _reference = value;
+    _referenceNumber = value;
   }
 
-  String get reference => _notes;
+  String get reference => _reference;
 
   set reference(value) {
     isDirty = true;
-    _notes = value;
+    _reference = value;
   }
 }

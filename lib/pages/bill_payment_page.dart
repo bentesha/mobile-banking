@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mkombozi_mobile/dialogs/message_dialog.dart';
 import 'package:mkombozi_mobile/dialogs/pin_code_dialog.dart';
+import 'package:mkombozi_mobile/formatters/decimal_input_formatter.dart';
 import 'package:mkombozi_mobile/helpers/formatters.dart';
 import 'package:mkombozi_mobile/models/account.dart';
 import 'package:mkombozi_mobile/models/service.dart';
@@ -53,14 +54,14 @@ class _StepOne extends WorkflowItem {
   Future<bool> moveNext(context) async {
     String message;
 
-    if (_data._account == null) {
+    if (_data.account == null) {
       message = 'Account is required';
-    } else if (_data._service == null) {
+    } else if (_data.service == null) {
       message = 'Service is required';
-    } else if (_data._amount == null || _data.amount.isEmpty) {
-      message = 'Enter amount';
-    } else if (_data._reference == null || _data.reference.isEmpty) {
+    } else if (_data.referenceNumber == null || _data.referenceNumber.isEmpty) {
       message = 'Enter reference number';
+    } else if (_data.amount == null || _data.amount.isEmpty) {
+      message = 'Enter amount';
     }
 
     if (message != null) {
@@ -76,10 +77,10 @@ class _StepOne extends WorkflowItem {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ServiceSelector(
-            label: 'Send payment to',
-            icon: Icon(Icons.account_balance_wallet_outlined),
-            service: _data.service,
-            onChanged: (value) => _data.service = value),
+          label: 'Send payment to',
+          icon: Icon(Icons.account_balance_wallet_outlined),
+          service: _data.service,
+          onChanged: (value) => _data.service = value),
         FormCellDivider(height: 32),
         AccountSelector(
           label: 'Pay from account',
@@ -88,14 +89,15 @@ class _StepOne extends WorkflowItem {
         ),
         FormCellDivider(),
         FormCellInput(
-            onChanged: (value) => _data.reference = value,
-            label: 'Control Number',
-            hintText: 'Enter control number',
-            initialValue: _data.reference,
-            icon: Icon(Icons.money)),
+          onChanged: (value) => _data.referenceNumber = value,
+          label: 'Reference Number',
+          hintText: 'Enter reference number',
+          initialValue: _data.referenceNumber,
+          icon: Icon(Icons.money)),
         FormCellDivider(),
         FormCellInput(
           label: 'Amount to pay',
+          inputFormatters: [DecimalInputFormatter()],
           initialValue: _data.amount?.toString(),
           onChanged: (value) => _data.amount = value,
           hintText: 'Enter amount to send. e.g 20,000',
@@ -106,8 +108,8 @@ class _StepOne extends WorkflowItem {
         FormCellDivider(),
         FormCellInput(
           label: 'Reference',
-          initialValue: _data.notes,
-          onChanged: (value) => _data.notes = value,
+          initialValue: _data.reference,
+          onChanged: (value) => _data.reference = value,
           hintText: 'For your reference',
           icon: Icon(Icons.notes),
         )
@@ -133,14 +135,15 @@ class _StepTwo extends WorkflowItem {
     request.service = _data.service;
     request.pin = pin;
     request.user = loginService.currentUser;
-    request.referenceNumber = _data.reference;
+    request.referenceNumber = _data.referenceNumber;
     final amount = double.parse(_data._amount.replaceAll(',', ''));
     request.amount = double.parse(_data._amount.replaceAll(',', ''));
-    request.reference = _data.notes;
+    request.reference = _data.reference;
 
     final response = await request.send();
     if (response.code == 200) {
-      String message = '${Formatter.formatCurrency(amount)} success sent to ${_data.service.name}';
+      String message =
+          '${Formatter.formatCurrency(amount)} success sent to ${_data.service.name}';
       await MessageDialog.show(context, message, 'Success');
       return true;
     }
@@ -178,10 +181,11 @@ class _StepTwo extends WorkflowItem {
                       LabelValueCell(
                           label: 'Pay from', value: _data.account.maskedNumber),
                       LabelValueCell(
-                          label: 'Reference number', value: _data.reference),
+                          label: 'Reference number',
+                          value: _data.referenceNumber),
                       LabelValueCell(label: 'Amount', value: _data.amount),
-                      LabelValueCell(label: 'Reference', value: _data.notes),
-                      LabelValueCell(label: 'Charges', value: '1,200.00')
+                      LabelValueCell(
+                          label: 'Reference', value: _data.reference),
                     ])))
       ],
     );
@@ -195,8 +199,8 @@ class _FormData {
   Service _service;
   Account _account;
   String _amount;
+  String _referenceNumber;
   String _reference;
-  String _notes;
   bool isDirty = false;
 
   _FormData(this._service, this._account);
@@ -222,17 +226,17 @@ class _FormData {
     _amount = value;
   }
 
+  String get referenceNumber => _referenceNumber;
+
+  set referenceNumber(value) {
+    isDirty = true;
+    _referenceNumber = value;
+  }
+
   String get reference => _reference;
 
   set reference(value) {
     isDirty = true;
     _reference = value;
-  }
-
-  String get notes => _notes;
-
-  set notes(value) {
-    isDirty = true;
-    _notes = value;
   }
 }

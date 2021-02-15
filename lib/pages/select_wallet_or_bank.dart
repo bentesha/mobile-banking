@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:mkombozi_mobile/models/wallet_or_bank.dart';
 import 'package:mkombozi_mobile/pages/bank_or_wallet_list.dart';
 
-class SelectDestinationAccountPage extends StatelessWidget {
+class SelectWalletOrBankPage extends StatelessWidget {
 
   static Future<WalletOrBank> navigateTo(BuildContext context) {
     return Navigator.of(context).push<WalletOrBank>(MaterialPageRoute(
-        builder: (context) => SelectDestinationAccountPage()
+        builder: (context) => SelectWalletOrBankPage()
     ));
   }
 

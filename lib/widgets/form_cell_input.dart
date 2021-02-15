@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:mkombozi_mobile/widgets/form_cell.dart';
 
 class FormCellInput extends StatelessWidget {
@@ -9,6 +10,7 @@ class FormCellInput extends StatelessWidget {
   final TextInputType inputType;
   final String initialValue;
   final ValueChanged<String> onChanged;
+  final List<TextInputFormatter> inputFormatters;
 
   final _controller = TextEditingController();
 
@@ -19,6 +21,7 @@ class FormCellInput extends StatelessWidget {
       this.icon,
       this.textAlign = TextAlign.start,
       this.inputType,
+      this.inputFormatters = const [],
       this.onChanged}) {
     _controller.text = this.initialValue ?? '';
   }
@@ -30,6 +33,7 @@ class FormCellInput extends StatelessWidget {
         icon: icon,
         child: TextField(
           controller: _controller,
+          inputFormatters: inputFormatters,
           onChanged: onChanged,
           textAlign: textAlign,
           keyboardType: inputType,

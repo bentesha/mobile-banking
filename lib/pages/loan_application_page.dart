@@ -1,13 +1,11 @@
-
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:mkombozi_mobile/dialogs/message_dialog.dart';
 import 'package:mkombozi_mobile/dialogs/pin_code_dialog.dart';
+import 'package:mkombozi_mobile/formatters/decimal_input_formatter.dart';
+import 'package:mkombozi_mobile/helpers/utils.dart';
 import 'package:mkombozi_mobile/models/account.dart';
 import 'package:mkombozi_mobile/networking/loan_application_request.dart';
-import 'package:mkombozi_mobile/networking/salary_advance_request.dart';
 import 'package:mkombozi_mobile/services/login_service.dart';
-import 'package:mkombozi_mobile/widgets/account_selector.dart';
 import 'package:mkombozi_mobile/widgets/form_cell_divider.dart';
 import 'package:mkombozi_mobile/widgets/form_cell_dropdown.dart';
 import 'package:mkombozi_mobile/widgets/form_cell_input.dart';
@@ -26,9 +24,9 @@ class LoanApplicationPage extends Workflow<_FormData> {
 
   LoanApplicationPage(this.account)
       : super(
-      title: 'Loan Application',
-      actionLabel: 'REQUEST LOAN',
-      confirmLabel: 'CONFIRM');
+            title: 'Loan Application',
+            actionLabel: 'REQUEST LOAN',
+            confirmLabel: 'CONFIRM');
 
   @override
   _FormData createWorkflowState() => _FormData(account);
@@ -59,7 +57,9 @@ class _StepOne extends WorkflowItem {
     } else if (_data.company == null || _data.company.isEmpty) {
       message = 'Company is required';
     } else if (_data.amount == null || _data.amount.isEmpty) {
-      message  = 'Enter loan requested amount';
+      message = 'Enter loan requested amount';
+    } else if (_data.duration == null || _data.duration.isEmpty) {
+      message = 'Select loan duration';
     }
 
     if (message != null) {
@@ -77,45 +77,43 @@ class _StepOne extends WorkflowItem {
         FormCellInput(
             onChanged: (value) => _data.netSalary = value,
             label: 'Net Salary',
+            inputFormatters: [DecimalInputFormatter()],
             hintText: 'Your net salary',
             inputType: TextInputType.number,
             textAlign: TextAlign.right,
             initialValue: _data.netSalary,
-            icon: Icon(Icons.attach_money)
-        ),
+            icon: Icon(Icons.attach_money)),
         FormCellDivider(),
         FormCellInput(
             onChanged: (value) => _data.description = value,
             label: 'Description',
             hintText: 'Load description',
             initialValue: _data.description,
-            icon: Icon(Icons.attach_money)
-        ),
+            icon: Icon(Icons.attach_money)),
         FormCellDivider(),
         FormCellInput(
             onChanged: (value) => _data.company = value,
             label: 'Company',
             hintText: 'Your company name',
             initialValue: _data.company,
-            icon: Icon(Icons.attach_money)
-        ),
+            icon: Icon(Icons.attach_money)),
         FormCellDivider(),
         FormCellInput(
             onChanged: (value) => _data.amount = value,
             label: 'Request Amount',
+            inputFormatters: [DecimalInputFormatter()],
             hintText: 'Loan requested amount',
             inputType: TextInputType.number,
             textAlign: TextAlign.right,
             initialValue: _data.amount,
-            icon: Icon(Icons.attach_money)
-        ),
+            icon: Icon(Icons.attach_money)),
         FormCellDivider(),
         FormCellDropDown(
             onChanged: (value) => _data.duration = value,
+            value: _data.duration,
             label: 'Requested Duration (month)',
             options: List.generate(36, (index) => (index + 1).toString()),
-            icon: Icon(Icons.attach_money)
-        ),
+            icon: Icon(Icons.attach_money)),
       ],
     );
   }
@@ -137,16 +135,16 @@ class _StepTwo extends WorkflowItem {
         account: _data.account,
         user: user,
         pin: pin,
-        netSalary: double.parse(_data.netSalary),
-        amount: double.parse(_data.amount),
+        netSalary: Utils.stringToDouble(_data.netSalary),
+        amount: Utils.stringToDouble(_data.amount),
         description: _data.description,
         company: _data.company,
-        duration: _data.duration
-    );
+        duration: _data.duration);
 
     final response = await request.send();
     if (response.code == 200) {
-      await MessageDialog.show(context, 'Your loan application has been submitted', 'Success');
+      await MessageDialog.show(
+          context, 'Your loan application has been submitted', 'Success');
       return true;
     }
 
@@ -172,32 +170,21 @@ class _StepTwo extends WorkflowItem {
         SizedBox(height: 32),
         Ink(
             decoration:
-            BoxDecoration(border: Border.all(color: Colors.grey.shade300)),
+                BoxDecoration(border: Border.all(color: Colors.grey.shade300)),
             child: Padding(
                 padding: EdgeInsets.all(16),
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       LabelValueCell(
-                          label: 'Net Salary',
-                          value: NumberFormat.decimalPattern().format(double.parse(_data.netSalary))
-                      ),
+                          label: 'Net Salary', value: _data.netSalary),
                       LabelValueCell(
-                          label: 'Description',
-                          value:_data.description
-                      ),
+                          label: 'Description', value: _data.description),
+                      LabelValueCell(label: 'Company', value: _data.company),
                       LabelValueCell(
-                          label: 'Company',
-                          value: _data.company
-                      ),
+                          label: 'Amount Requested', value: _data.amount),
                       LabelValueCell(
-                          label: 'Amount Requested',
-                          value: NumberFormat.decimalPattern().format(double.parse(_data.amount))
-                      ),
-                      LabelValueCell(
-                          label: 'Repayment Period',
-                          value: _data.duration
-                      )
+                          label: 'Repayment Period', value: _data.duration)
                     ])))
       ],
     );
@@ -254,5 +241,4 @@ class _FormData {
     isDirty = true;
     _duration = value;
   }
-
 }

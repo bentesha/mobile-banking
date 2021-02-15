@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mkombozi_mobile/dialogs/message_dialog.dart';
 import 'package:mkombozi_mobile/dialogs/pin_code_dialog.dart';
+import 'package:mkombozi_mobile/formatters/decimal_input_formatter.dart';
+import 'package:mkombozi_mobile/formatters/number_input_formatter.dart';
 import 'package:mkombozi_mobile/helpers/utils.dart';
 import 'package:mkombozi_mobile/models/account.dart';
 import 'package:mkombozi_mobile/networking/atm_widthdrawal_request.dart';
@@ -51,10 +53,12 @@ class _StepOne extends WorkflowItem {
 
     if (_data._account == null) {
       message = 'Account is required';
+    } else if (_data.recipientMobile == null || _data.recipientMobile.isEmpty) {
+      message = 'Enter phone number';
+    } else if (!Utils.validatePhoneNumber(_data.recipientMobile)) {
+      message = 'Enter a valid phone number';
     } else if (_data._amount == null || _data.amount.isEmpty) {
       message = 'Enter amount';
-    } else if (_data._reference == null || _data.reference.isEmpty) {
-      message = 'Enter phone number';
     }
 
     if (message != null) {
@@ -76,14 +80,17 @@ class _StepOne extends WorkflowItem {
         ),
         FormCellDivider(),
         FormCellInput(
-            onChanged: (value) => _data.recipientMobile = value,
-            label: 'Mobile Number',
-            hintText: 'Enter phone number',
-            initialValue: _data.recipientMobile,
-            icon: Icon(Icons.money)),
+          onChanged: (value) => _data.recipientMobile = value,
+          inputFormatters: [NumberInputFormatter(length: 12)],
+          label: 'Mobile Number',
+          hintText: 'Enter phone number',
+          inputType: TextInputType.number,
+          initialValue: _data.recipientMobile,
+          icon: Icon(Icons.money)),
         FormCellDivider(),
         FormCellInput(
           label: 'Amount',
+          inputFormatters: [DecimalInputFormatter()],
           initialValue: _data.amount?.toString(),
           onChanged: (value) => _data.amount = value,
           hintText: 'Enter amount e.g 20,000',

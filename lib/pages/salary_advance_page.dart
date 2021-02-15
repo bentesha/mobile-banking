@@ -1,8 +1,8 @@
-
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:mkombozi_mobile/dialogs/message_dialog.dart';
 import 'package:mkombozi_mobile/dialogs/pin_code_dialog.dart';
+import 'package:mkombozi_mobile/formatters/decimal_input_formatter.dart';
+import 'package:mkombozi_mobile/helpers/utils.dart';
 import 'package:mkombozi_mobile/models/account.dart';
 import 'package:mkombozi_mobile/networking/salary_advance_request.dart';
 import 'package:mkombozi_mobile/services/login_service.dart';
@@ -24,9 +24,9 @@ class SalaryAdvancePage extends Workflow<_FormData> {
 
   SalaryAdvancePage(this.account)
       : super(
-      title: 'Salary Advance',
-      actionLabel: 'REQUEST ADVANCE',
-      confirmLabel: 'CONFIRM');
+            title: 'Salary Advance',
+            actionLabel: 'REQUEST ADVANCE',
+            confirmLabel: 'CONFIRM');
 
   @override
   _FormData createWorkflowState() => _FormData(account);
@@ -52,7 +52,9 @@ class _StepOne extends WorkflowItem {
 
     if (_data._account == null) {
       message = 'Account is required';
-    } else if (_data._amount == null || _data.amount.isEmpty) {
+    } else if (_data.netSalary == null || _data.netSalary.isEmpty) {
+      message = 'Enter net salary';
+    } else if (_data.amount == null || _data.amount.isEmpty) {
       message = 'Enter amount';
     }
 
@@ -77,24 +79,22 @@ class _StepOne extends WorkflowItem {
         FormCellInput(
           onChanged: (value) => _data.netSalary = value,
           label: 'Net Salary',
+          inputFormatters: [DecimalInputFormatter()],
           hintText: 'Your net salary amount',
           inputType: TextInputType.number,
           textAlign: TextAlign.right,
           initialValue: _data.netSalary,
-          icon: Icon(Icons.attach_money)
-        ),
+          icon: Icon(Icons.attach_money)),
         FormCellDivider(),
         FormCellInput(
           onChanged: (value) => _data.amount = value,
+          inputFormatters: [DecimalInputFormatter()],
           label: 'Advance Amount',
           hintText: 'Requested salary advance amount',
           inputType: TextInputType.number,
           textAlign: TextAlign.right,
           initialValue: _data.amount,
-          icon: Icon(Icons.attach_money)
-        ),
-
-
+          icon: Icon(Icons.attach_money)),
       ],
     );
   }
@@ -113,16 +113,16 @@ class _StepTwo extends WorkflowItem {
     }
     final user = Provider.of<LoginService>(context, listen: false).currentUser;
     final request = SalaryAdvanceRequest(
-      account: _data.account,
-      user: user,
-      pin: pin,
-      netSalary: double.parse(_data.netSalary),
-      amount: double.parse(_data.amount)
-    );
+        account: _data.account,
+        user: user,
+        pin: pin,
+        netSalary: Utils.stringToDouble(_data.netSalary),
+        amount: Utils.stringToDouble(_data.amount));
 
     final response = await request.send();
     if (response.code == 200) {
-      await MessageDialog.show(context, 'Your salary advance request has been submitted', 'Success');
+      await MessageDialog.show(
+          context, 'Your salary advance request has been submitted', 'Success');
       return true;
     }
 
@@ -148,24 +148,18 @@ class _StepTwo extends WorkflowItem {
         SizedBox(height: 32),
         Ink(
             decoration:
-            BoxDecoration(border: Border.all(color: Colors.grey.shade300)),
+                BoxDecoration(border: Border.all(color: Colors.grey.shade300)),
             child: Padding(
                 padding: EdgeInsets.all(16),
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       LabelValueCell(
-                          label: 'Account',
-                          value: _data.account.maskedNumber
-                      ),
+                          label: 'Account', value: _data.account.maskedNumber),
                       LabelValueCell(
-                          label: 'Net Salary',
-                          value: NumberFormat.decimalPattern().format(double.parse(_data.netSalary))
-                      ),
+                          label: 'Net Salary', value: _data.netSalary),
                       LabelValueCell(
-                          label: 'Requested Advance',
-                          value: NumberFormat.decimalPattern().format(double.parse(_data.amount))
-                      )
+                          label: 'Requested Advance', value: _data.amount)
                     ])))
       ],
     );
@@ -203,5 +197,4 @@ class _FormData {
     isDirty = true;
     _amount = value;
   }
-
 }

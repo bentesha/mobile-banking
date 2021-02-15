@@ -9,14 +9,14 @@ import 'package:mkombozi_mobile/models/service.dart';
 import 'package:mkombozi_mobile/pages/account_statement_page.dart';
 import 'package:mkombozi_mobile/pages/agency_withdrawal_page.dart';
 import 'package:mkombozi_mobile/pages/atm_card_request_page.dart';
-import 'package:mkombozi_mobile/pages/bill_payment.dart';
+import 'package:mkombozi_mobile/pages/bill_payment_page.dart';
 import 'package:mkombozi_mobile/pages/atm_withdrawal_page.dart';
 import 'package:mkombozi_mobile/pages/cheque_book_request_page.dart';
 import 'package:mkombozi_mobile/pages/loan_application_page.dart';
 import 'package:mkombozi_mobile/pages/luku_token_list.dart';
 import 'package:mkombozi_mobile/pages/profile_page.dart';
 import 'package:mkombozi_mobile/pages/salary_advance_page.dart';
-import 'package:mkombozi_mobile/pages/select_destination_account.dart';
+import 'package:mkombozi_mobile/pages/select_wallet_or_bank.dart';
 import 'package:mkombozi_mobile/pages/select_service.dart';
 import 'package:mkombozi_mobile/pages/select_cash_out_method.dart';
 import 'package:mkombozi_mobile/pages/send_money_page.dart';
@@ -264,7 +264,7 @@ class ActionBar extends StatelessWidget {
         }
         BillPaymentPage.navigateTo(context, _getCurrentAccount(context), service);
       } else if (index == 1) {
-        final walletOrBank = await SelectDestinationAccountPage.navigateTo(context);
+        final walletOrBank = await SelectWalletOrBankPage.navigateTo(context);
         if (walletOrBank == null) {
           return;
         }

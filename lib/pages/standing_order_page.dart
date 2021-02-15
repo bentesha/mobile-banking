@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mkombozi_mobile/dialogs/message_dialog.dart';
 import 'package:mkombozi_mobile/dialogs/pin_code_dialog.dart';
+import 'package:mkombozi_mobile/formatters/decimal_input_formatter.dart';
+import 'package:mkombozi_mobile/formatters/number_input_formatter.dart';
 import 'package:mkombozi_mobile/models/account.dart';
 import 'package:mkombozi_mobile/networking/standing_order_request.dart';
 import 'package:mkombozi_mobile/services/login_service.dart';
 import 'package:mkombozi_mobile/widgets/account_selector.dart';
 import 'package:mkombozi_mobile/widgets/form_cell_date.dart';
 import 'package:mkombozi_mobile/widgets/form_cell_divider.dart';
+import 'package:mkombozi_mobile/widgets/form_cell_dropdown.dart';
 import 'package:mkombozi_mobile/widgets/form_cell_input.dart';
 import 'package:mkombozi_mobile/widgets/label_value_cell.dart';
 import 'package:mkombozi_mobile/widgets/workflow.dart';
@@ -24,9 +27,9 @@ class StandingOrderPage extends Workflow<_FormData> {
 
   StandingOrderPage(this.account)
       : super(
-      title: 'Standing Order',
-      actionLabel: 'SET ORDER',
-      confirmLabel: 'CONFIRM');
+            title: 'Standing Order',
+            actionLabel: 'SET ORDER',
+            confirmLabel: 'CONFIRM');
 
   @override
   _FormData createWorkflowState() => _FormData(account);
@@ -60,7 +63,8 @@ class _StepOne extends WorkflowItem {
       message = 'Enter institution name';
     } else if (_data.institutionCode == null || _data.institutionCode.isEmpty) {
       message = 'Enter institution code';
-    } else if (_data.numberOfExecutions == null || _data.numberOfExecutions.isEmpty) {
+    } else if (_data.numberOfExecutions == null ||
+        _data.numberOfExecutions.isEmpty) {
       message = 'Enter number of executions';
     } else if (_data.startDate == null) {
       message = 'Enter start date';
@@ -87,14 +91,14 @@ class _StepOne extends WorkflowItem {
         ),
         FormCellDivider(),
         FormCellInput(
-          onChanged: (value) => _data.amount = value,
-          label: 'Amount',
-          hintText: 'Standing order amount',
-          inputType: TextInputType.number,
-          textAlign: TextAlign.right,
-          initialValue: _data.amount,
-          icon: Icon(Icons.attach_money)
-        ),
+            onChanged: (value) => _data.amount = value,
+            label: 'Amount',
+            inputFormatters: [DecimalInputFormatter()],
+            hintText: 'Standing order amount',
+            inputType: TextInputType.number,
+            textAlign: TextAlign.right,
+            initialValue: _data.amount,
+            icon: Icon(Icons.attach_money)),
         FormCellDivider(),
         FormCellInput(
           label: 'Account Number',
@@ -113,15 +117,15 @@ class _StepOne extends WorkflowItem {
         ),
         FormCellDivider(),
         FormCellInput(
-          label: 'Institution Code',
-          hintText: 'Code of the receiving institution',
-          initialValue: _data.institutionCode,
-          onChanged: (value) => _data.institutionCode = value,
-          icon: Icon(Icons.tag)
-        ),
+            label: 'Institution Code',
+            hintText: 'Code of the receiving institution',
+            initialValue: _data.institutionCode,
+            onChanged: (value) => _data.institutionCode = value,
+            icon: Icon(Icons.tag)),
         FormCellDivider(),
         FormCellInput(
           label: 'Number of Executions',
+          inputFormatters: [NumberInputFormatter()],
           hintText: 'Number of standing order executions',
           initialValue: _data.numberOfExecutions,
           onChanged: (value) => _data.numberOfExecutions = value,
@@ -130,17 +134,16 @@ class _StepOne extends WorkflowItem {
         ),
         FormCellDivider(),
         FormCellDate(
-          label: 'Start Date',
-          hintText: 'Standing order start date',
-          date: _data.startDate,
-          onChanged: (value) => _data.startDate = value,
-          icon: Icon(Icons.date_range)
-        ),
+            label: 'Start Date',
+            hintText: 'Standing order start date',
+            date: _data.startDate,
+            onChanged: (value) => _data.startDate = value,
+            icon: Icon(Icons.date_range)),
         FormCellDivider(),
-        FormCellInput(
+        FormCellDropDown(
           label: 'Day of Month',
-          hintText: 'Day of month',
-          initialValue: _data.dayOfMonth,
+          value: _data.dayOfMonth,
+          options: List.generate(31, (index) => (index + 1).toString()),
           icon: Icon(Icons.date_range),
           onChanged: (value) => _data.dayOfMonth = value,
         )
@@ -171,11 +174,11 @@ class _StepTwo extends WorkflowItem {
         amount: double.parse(_data.amount),
         recipientAccount: _data.accountNumber,
         institutionName: _data.institutionName,
-        institutionCode: _data.institutionCode
-    );
+        institutionCode: _data.institutionCode);
     final response = await request.send();
     if (response.code == 200) {
-      await MessageDialog.show(context, 'Standing order was successfully set', 'Success');
+      await MessageDialog.show(
+          context, 'Standing order was successfully set', 'Success');
       return true;
     }
 
@@ -200,28 +203,33 @@ class _StepTwo extends WorkflowItem {
         ]),
         SizedBox(height: 32),
         Ink(
-          decoration:
-          BoxDecoration(border: Border.all(color: Colors.grey.shade300)),
-          child: Padding(
-            padding: EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                LabelValueCell(
-                  label: 'Pay from',
-                  value: _data.account.maskedNumber
-                ),
-                LabelValueCell(
-                  label: 'Amount',
-                  value: NumberFormat.decimalPattern().format(double.parse(_data._amount))
-                ),
-                LabelValueCell(label: 'Account Number', value: _data.accountNumber),
-                LabelValueCell(label: 'Institution Name', value: _data.institutionName),
-                LabelValueCell(label: 'Institution Code', value: _data.institutionCode),
-                LabelValueCell(label: 'Number of executions', value: _data.numberOfExecutions),
-                LabelValueCell(label: 'Start date', value: DateFormat.yMMMd().format(_data.startDate)),
-                LabelValueCell(label: 'Day of month', value: _data.dayOfMonth.toString())
-              ])))
+            decoration:
+                BoxDecoration(border: Border.all(color: Colors.grey.shade300)),
+            child: Padding(
+                padding: EdgeInsets.all(16),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      LabelValueCell(
+                          label: 'Pay from', value: _data.account.maskedNumber),
+                      LabelValueCell(label: 'Amount', value: _data.amount),
+                      LabelValueCell(
+                          label: 'Account Number', value: _data.accountNumber),
+                      LabelValueCell(
+                          label: 'Institution Name',
+                          value: _data.institutionName),
+                      LabelValueCell(
+                          label: 'Institution Code',
+                          value: _data.institutionCode),
+                      LabelValueCell(
+                          label: 'Number of executions',
+                          value: _data.numberOfExecutions),
+                      LabelValueCell(
+                          label: 'Start date',
+                          value: DateFormat.yMMMd().format(_data.startDate)),
+                      LabelValueCell(
+                          label: 'Day of month', value: _data.dayOfMonth)
+                    ])))
       ],
     );
   }
@@ -298,5 +306,4 @@ class _FormData {
     isDirty = true;
     _amount = value;
   }
-
 }
