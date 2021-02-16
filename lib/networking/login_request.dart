@@ -31,6 +31,7 @@ class LoginRequest extends NetworkRequest<LoginResponse> {
     final int code = response['code'];
     final String message = response['message'];
     final result = LoginResponse(code, message);
+    result.description = response['description'];
 
     if (code == 200) {
       final accounts = asMapList(data['accounts']);
