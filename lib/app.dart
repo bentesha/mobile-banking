@@ -1,7 +1,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:mkombozi_mobile/pages/home.dart';
+import 'package:mkombozi_mobile/pages/landing_page.dart';
 import 'package:mkombozi_mobile/pages/login.dart';
+import 'package:mkombozi_mobile/pages/register_page.dart';
 import 'package:mkombozi_mobile/services/login_service.dart';
 import 'package:provider/provider.dart';
 
@@ -27,9 +29,11 @@ class MyApp extends StatelessWidget {
         ),
         iconTheme: theme.iconTheme.copyWith(color: Colors.grey.shade500),
       ),
-      initialRoute: LoginPage.routeName,
+      // initialRoute: LoginPage.routeName,
+      home: LandingPage(),
       routes: {
         '/start': (_)=> LoginPage(),
+        RegisterPage.routeName: (_) => RegisterPage(),
         LoginPage.routeName: (_) => LoginPage(),
         HomePage.routeName: (_) => HomePage(),
       }

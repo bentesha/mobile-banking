@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:mkombozi_mobile/decorations/primary_background_gradient.dart';
+import 'package:mkombozi_mobile/theme/primary_background_gradient.dart';
 import 'package:mkombozi_mobile/dialogs/message_dialog.dart';
 import 'package:mkombozi_mobile/pages/home.dart';
 import 'package:mkombozi_mobile/services/login_service.dart';

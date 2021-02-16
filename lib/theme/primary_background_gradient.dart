@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:mkombozi_mobile/theme/theme.dart';
 
 class PrimaryBackgroundGradient extends LinearGradient {
 
@@ -7,8 +8,9 @@ class PrimaryBackgroundGradient extends LinearGradient {
       begin: Alignment.bottomLeft,
       end: Alignment.topRight,
       colors: [
-      Color(0xff0a3057),
-        Color(0xff338ef9),
+        Color(0xff0a3057),
+        Color(0xff0a3057),
+        AppTheme.primaryColor,//Color(0xff338ef9),
         Color(0xff0a3057),
       ]
     );

@@ -3,7 +3,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:mkombozi_mobile/decorations/primary_background_gradient.dart';
+import 'package:mkombozi_mobile/theme/primary_background_gradient.dart';
 import 'package:mkombozi_mobile/models/account.dart';
 import 'package:mkombozi_mobile/models/service.dart';
 import 'package:mkombozi_mobile/pages/account_statement_page.dart';
