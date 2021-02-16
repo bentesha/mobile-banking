@@ -47,9 +47,10 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-    //   statusBarColor: Color(0xff072d52), //or set color with: Color(0xFF0000FF)
-    // ));
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: Colors.blue.shade900,
+      statusBarIconBrightness: Brightness.light//or set color with: Color(0xFF0000FF)
+    ));
 
     return Scaffold(
       drawer: DrawerMenu(onAction: _handleDrawerMenuAction),
