@@ -15,6 +15,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final loginService = Provider.of<LoginService>(context, listen: false);
+    final initialRoute = loginService.currentUser == null
+        ? START_PAGE : LoginPage.routeName;
 
     return MaterialApp(
       title: 'Flutter Demo',
@@ -29,10 +32,9 @@ class MyApp extends StatelessWidget {
         ),
         iconTheme: theme.iconTheme.copyWith(color: Colors.grey.shade500),
       ),
-      // initialRoute: LoginPage.routeName,
-      home: LandingPage(),
+      initialRoute: initialRoute,
       routes: {
-        '/start': (_)=> LoginPage(),
+        START_PAGE: (_)=> LandingPage(),
         RegisterPage.routeName: (_) => RegisterPage(),
         LoginPage.routeName: (_) => LoginPage(),
         HomePage.routeName: (_) => HomePage(),

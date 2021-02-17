@@ -11,6 +11,8 @@ import 'package:mkombozi_mobile/widgets/pill_button.dart';
 
 class LandingPage extends StatelessWidget {
 
+  static final routeName = '/start';
+
   @override
   build(context) => Scaffold(
     body: Container(
