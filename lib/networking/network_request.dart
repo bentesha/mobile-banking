@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
+import 'package:device_info/device_info.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:mkombozi_mobile/networking/network_response.dart';
@@ -15,7 +16,6 @@ abstract class NetworkRequest<T extends NetworkResponse> {
   static const SERVICE_IMAGE_BASE_URL = '${END_POINT}service_logos/';
   static const BANK_IMAGE_BASE_URL = '${END_POINT}bank_logos/';
   static const WALLET_IMAGE_BASE_URL = '${END_POINT}wallet_logos/';
-  static const DEVICE_ID = '27fd082e222be23d';
 
   static const APP_VERSION = '1.6.0';
 
@@ -32,9 +32,10 @@ abstract class NetworkRequest<T extends NetworkResponse> {
     final client = http.Client();
     final request = http.Request(method, Uri.parse(END_POINT));
     request.followRedirects = true;
+    final deviceInfo = await DeviceInfoPlugin().androidInfo;
     final params = HashMap<String, dynamic>();
     params['service_id']  = serviceId;
-    params['udid'] = DEVICE_ID;
+    params['udid'] = deviceInfo.androidId;
     params.addAll(this.params);
     print('params: $params');
     request.bodyFields = params.cast();
