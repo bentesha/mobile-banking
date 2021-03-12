@@ -21,16 +21,16 @@ class LandingPage extends StatelessWidget {
       width: double.infinity,
       padding: EdgeInsets.all(32),
       decoration: BoxDecoration(
-        gradient: PrimaryBackgroundGradient()
+        // gradient: PrimaryBackgroundGradient()
       ),
       child: Column(
         children: [
           Expanded(
             child: Image.asset(Assets.appLogo,
-              height: 150,
-              width: 150,
+              // height: 150,
+              width: 180,
               fit: BoxFit.contain,
-              color: Colors.white
+              // color: Colors.white
             )
           ),
           SizedBox(
@@ -47,16 +47,16 @@ class LandingPage extends StatelessWidget {
                   )
                 ),
                 SizedBox(height: 8),
-                Text('MKOMBOZI COMMERCIAL BANK',
+                Text('MWALIMU COMMERCIAL BANK',
                   style: TextStyle(
                     fontSize: 16,
-                    color: Colors.white,
+                    color: AppTheme.primaryColor,
                     fontWeight: FontWeight.bold
                   )
                 ),
                 Text('Mobile Banking',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: AppTheme.primaryColor,
                     fontWeight: FontWeight.bold
                   )
                 ),
@@ -64,12 +64,12 @@ class LandingPage extends StatelessWidget {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(Icons.info_outline, color: Colors.white, size: 18),
+                    Icon(Icons.info_outline, color: AppTheme.primaryColor, size: 18),
                     SizedBox(width: 8),
                     Flexible(
                       child: Text('If this is the first time to use this app on your device, click register.',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: AppTheme.primaryColor,
                           fontSize: 12,
                         )
                       )
@@ -86,6 +86,7 @@ class LandingPage extends StatelessWidget {
               PillButton(
                 caption: 'REGISTER',
                 color: AppTheme.accentColor,
+                textColor: Colors.white,
                 onPressed: () {
                   Navigator.of(context).pushNamed(RegisterPage.routeName);
                 },

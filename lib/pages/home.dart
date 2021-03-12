@@ -23,6 +23,7 @@ import 'package:mkombozi_mobile/pages/select_cash_out_method.dart';
 import 'package:mkombozi_mobile/pages/send_money_page.dart';
 import 'package:mkombozi_mobile/pages/standing_order_page.dart';
 import 'package:mkombozi_mobile/services/account_service.dart';
+import 'package:mkombozi_mobile/theme/theme.dart';
 import 'package:mkombozi_mobile/widgets/account_card.dart';
 import 'package:mkombozi_mobile/widgets/drawer_menu.dart';
 import 'package:mkombozi_mobile/widgets/progress_view.dart';
@@ -50,6 +51,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: Colors.blue.shade900,
+      statusBarBrightness: Brightness.light,
       statusBarIconBrightness: Brightness.light//or set color with: Color(0xFF0000FF)
     ));
 
@@ -203,7 +205,7 @@ class Header extends StatelessWidget {
                 },
                 icon: Icon(Icons.menu),
               ),
-              title: Text('MKOMBOZI Bank',
+              title: Text('MCB Mobile Bank',
                 style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 16
@@ -291,12 +293,12 @@ class ActionBar extends StatelessWidget {
 
     return Ink(
       padding: EdgeInsets.symmetric(vertical: 8),
-      color: Color(0xff086086),
+      color: AppTheme.primaryColor,
       child: BottomNavigationBar(
         onTap: _handleActionButton,
         elevation: 0,
-        selectedItemColor: Color(0xffa3cc55),
-        unselectedItemColor: Color(0xffa3cc55),
+        selectedItemColor: Colors.white,
+        unselectedItemColor: Colors.white,
         backgroundColor: Colors.transparent,
         selectedLabelStyle: TextStyle(
           fontWeight: FontWeight.w700,
@@ -327,7 +329,7 @@ class ActionBar extends StatelessWidget {
               child: SvgPicture.asset('assets/cash-out.svg',
                 height: 24,
                 width: 24,
-                color: Theme.of(context).accentColor
+                color: Colors.white
               ),
             ),
             label: 'CASH OUT'

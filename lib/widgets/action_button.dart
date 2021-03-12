@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:mkombozi_mobile/theme/theme.dart';
 
 class ActionButton extends StatelessWidget {
   ActionButton(
@@ -18,7 +19,7 @@ class ActionButton extends StatelessWidget {
         onTap: loading ? null : onPressed,
         child: Ink(
           padding: EdgeInsets.symmetric(vertical: 18),
-          color: onPressed == null ? Colors.grey.shade500 : Theme.of(context).primaryColor,
+          color: onPressed == null ? Colors.grey.shade500 : AppTheme.primaryColor,
           child: Center(
             child: Text(loading ? loadingCaption : caption,
                 style: TextStyle(

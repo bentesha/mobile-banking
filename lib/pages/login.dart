@@ -4,6 +4,7 @@ import 'package:mkombozi_mobile/theme/primary_background_gradient.dart';
 import 'package:mkombozi_mobile/dialogs/message_dialog.dart';
 import 'package:mkombozi_mobile/pages/home.dart';
 import 'package:mkombozi_mobile/services/login_service.dart';
+import 'package:mkombozi_mobile/theme/theme.dart';
 import 'package:mkombozi_mobile/widgets/pin_code_input.dart';
 import 'package:provider/provider.dart';
 
@@ -52,31 +53,35 @@ class _LoginPageState extends State<LoginPage> {
           child: Column(children: [
         Container(
             width: double.infinity,
-            decoration: BoxDecoration(gradient: PrimaryBackgroundGradient()),
+            //decoration: BoxDecoration(gradient: PrimaryBackgroundGradient()),
             child: Consumer<LoginService>(builder: (context, loginService, _) {
               final user = loginService.currentUser;
               return Column(
                 children: [
-                  SizedBox(height: 72),
+                  SizedBox(height: 150),
                   Container(
                       decoration: BoxDecoration(
-                          color: Colors.white, shape: BoxShape.circle),
+                          color: Colors.white,
+                          //shape: BoxShape.circle
+                      ),
                       child: Padding(
                           padding: EdgeInsets.all(8),
                           child: Image.asset('assets/mkcb_logo.png',
-                              height: 100, width: 100))),
-                  SizedBox(height: 32),
+                              //height: 100,
+                              width: 150
+                          ))),
+                  SizedBox(height: 70),
                   Text('Hello!',
-                      style: TextStyle(fontSize: 18, color: Colors.white)),
+                      style: TextStyle(fontSize: 18, color: AppTheme.primaryColor)),
                   SizedBox(height: 8),
                   Text(user?.name ?? '',
                       style: TextStyle(
-                          color: Colors.white,
+                          color: AppTheme.primaryColor,
                           fontSize: 18,
                           fontWeight: FontWeight.bold)),
                   SizedBox(height: 32),
                   Text('Enter your PIN to continue',
-                      style: TextStyle(color: Colors.white)),
+                      style: TextStyle(color: AppTheme.primaryColor)),
                   SizedBox(height: 32),
                 ],
               );

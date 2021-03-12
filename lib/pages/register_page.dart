@@ -113,6 +113,7 @@ class _PageState extends State<RegisterPage> {
             PillButton(
               caption: _loading ? 'PLEASE WAIT..' : 'REGISTER',
               color: AppTheme.accentColor,
+              textColor: enableButton ? Colors.white : Colors.white30,
               disabledColor: AppTheme.accentColor.withOpacity(0.5),
               onPressed: enableButton ? _handleRegister : null,
             )

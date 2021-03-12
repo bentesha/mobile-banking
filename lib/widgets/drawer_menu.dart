@@ -55,12 +55,12 @@ class DrawerMenu extends StatelessWidget {
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  CircleAvatar(
-                    backgroundImage: AssetImage('assets/mkcb_logo.png'),
-                    backgroundColor: Colors.white,
-                    radius: 36,
-                  ),
-                  SizedBox(height: 16),
+                  // CircleAvatar(
+                  //   backgroundImage: AssetImage('assets/mkcb_logo.png'),
+                  //   backgroundColor: Colors.white,
+                  //   radius: 36,
+                  // ),
+                  SizedBox(height: 90),
                   InkWell(
                     onTap: () {
                       Navigator.of(context).pop();
