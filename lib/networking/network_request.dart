@@ -41,7 +41,7 @@ abstract class NetworkRequest<T extends NetworkResponse> {
     request.bodyFields = params.cast();
     request.headers['content-type'] = contentType;
     try {
-      final response = await client.send(request).timeout(Duration(seconds: 10));
+      final response = await client.send(request).timeout(Duration(seconds: 30));
       final jsonResult = await response.stream.bytesToString();
       print('---- begin network result ----');
       print(jsonResult);
