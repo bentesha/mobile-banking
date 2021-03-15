@@ -143,7 +143,7 @@ class _StepTwo extends WorkflowItem {
     final response = await request.send();
     if (response.code == 200) {
       String message =
-          '${Formatter.formatCurrency(amount)} success sent to ${_data.service.name}';
+          '${Formatter.formatCurrency(amount)} successfully sent to ${_data.service.name}';
       await MessageDialog.show(
           context: context, message: message, title: 'Success');
       return true;

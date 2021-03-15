@@ -3,7 +3,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mkombozi_mobile/dialogs/confirm_dialog.dart';
 import 'package:mkombozi_mobile/widgets/action_button.dart';
-import 'package:mkombozi_mobile/widgets/progress_view.dart';
 import 'package:mkombozi_mobile/widgets/workflow_item.dart';
 
 abstract class Workflow<TState> extends StatefulWidget {
@@ -102,10 +101,6 @@ class WorkflowState<TState> extends State<Workflow<TState>> {
       appBar: AppBar(
         title: Text(widget.title),
         backgroundColor: Colors.white,
-        // leading: IconButton(
-        //   onPressed: () {},
-        //   icon: Icon(Icons.close)
-        // ),
         elevation: 0,
         textTheme: Theme.of(context).textTheme,
         iconTheme: Theme.of(context).iconTheme.copyWith(color: Colors.grey.shade700),
@@ -119,37 +114,6 @@ class WorkflowState<TState> extends State<Workflow<TState>> {
           onPressed: loading ? null : _handleActionButton,
         )
       ),
-    //Material(
-      //   // elevation: 8,
-      //   // type: MaterialType.card,
-      //   child: Container(
-      //     padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      //     decoration: BoxDecoration(
-      //       color: Colors.white,
-      //       boxShadow: [
-      //         BoxShadow(
-      //           color: Colors.grey.shade500,
-      //           blurRadius: 2
-      //         )
-      //       ]
-      //     ),
-      //     child: Row(
-      //       mainAxisAlignment: MainAxisAlignment.end,
-      //       children: [
-      //         ElevatedButton(
-      //           onPressed: loading ? null : _handleActionButton,
-      //           child: Row(
-      //             children: [
-      //               Text((index == 0 ? widget.actionLabel : widget.confirmLabel) ?? ''),
-      //               SizedBox(width: 8),
-      //               Icon(Icons.arrow_right_alt_sharp)
-      //             ],
-      //           ),
-      //         )
-      //       ].where((w) => w != null).toList(),
-      //     ),
-      //   )
-      // ),
       body: SafeArea(
         child:
           WillPopScope(
@@ -201,7 +165,7 @@ class _LoadingStep extends WorkflowItem {
         )
       ),
       SizedBox(height: 16),
-      Text('Sending money to Tigo Pesa 0713 898493'),
+      // Text('Sending money to Tigo Pesa 0713 898493'),
       SizedBox(height: 32),
       CircularProgressIndicator(
         backgroundColor: Theme.of(context).primaryColor,
