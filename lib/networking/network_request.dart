@@ -37,6 +37,7 @@ abstract class NetworkRequest<T extends NetworkResponse> {
     params['service_id']  = serviceId;
     params['udid'] = deviceInfo.androidId;
     params.addAll(this.params);
+    params.forEach((key, value) => params[key] = value ?? '');
     print('params: $params');
     request.bodyFields = params.cast();
     request.headers['content-type'] = contentType;
