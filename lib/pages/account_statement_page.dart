@@ -258,37 +258,37 @@ class _StatementHeader extends StatelessWidget {
                     ),
                   ),
                   Divider(height: 1),
-                  Row(
-                    children: [
-                      Expanded(
-                          child: ListTile(
-                        title: Text(
-                          'Opening Balance',
-                          style: titleStyle,
-                          textAlign: TextAlign.center,
-                        ),
-                        subtitle: Text(
-                          openingBalance,
-                          style: balanceStyle,
-                          textAlign: TextAlign.center,
-                        ),
-                      )),
-                      SizedBox(height: 48, child: VerticalDivider(width: 1)),
-                      Expanded(
-                          child: ListTile(
-                        title: Text(
-                          'Closing Balance',
-                          style: titleStyle,
-                          textAlign: TextAlign.center,
-                        ),
-                        subtitle: Text(
-                          closingBalance,
-                          style: balanceStyle,
-                          textAlign: TextAlign.center,
-                        ),
-                      ))
-                    ],
-                  )
+                  // Row(
+                  //   children: [
+                  //     Expanded(
+                  //         child: ListTile(
+                  //       title: Text(
+                  //         'Opening Balance',
+                  //         style: titleStyle,
+                  //         textAlign: TextAlign.center,
+                  //       ),
+                  //       subtitle: Text(
+                  //         openingBalance,
+                  //         style: balanceStyle,
+                  //         textAlign: TextAlign.center,
+                  //       ),
+                  //     )),
+                  //     SizedBox(height: 48, child: VerticalDivider(width: 1)),
+                  //     Expanded(
+                  //         child: ListTile(
+                  //       title: Text(
+                  //         'Closing Balance',
+                  //         style: titleStyle,
+                  //         textAlign: TextAlign.center,
+                  //       ),
+                  //       subtitle: Text(
+                  //         closingBalance,
+                  //         style: balanceStyle,
+                  //         textAlign: TextAlign.center,
+                  //       ),
+                  //     ))
+                  //   ],
+                  // )
                 ],
               )),
           ],
