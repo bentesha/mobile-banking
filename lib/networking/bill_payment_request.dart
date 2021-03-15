@@ -1,5 +1,4 @@
 
-import 'package:mkombozi_mobile/networking/network_response.dart';
 import 'package:mkombozi_mobile/networking/payment_request.dart';
 
 class BillPaymentRequest extends PaymentRequest {
@@ -16,11 +15,6 @@ class BillPaymentRequest extends PaymentRequest {
     map['utility'] = service.mti;
 
     return map;
-  }
-
-  @override
-  NetworkResponse createResponse(Map<String, dynamic> data) {
-    throw UnimplementedError();
   }
 
 }
