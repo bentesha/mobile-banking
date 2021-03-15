@@ -6,7 +6,7 @@ import 'package:mkombozi_mobile/models/user.dart';
 import 'package:mkombozi_mobile/networking/network_request.dart';
 import 'package:mkombozi_mobile/networking/network_response.dart';
 import 'package:mkombozi_mobile/networking/salary_advance_response.dart';
-import 'package:shortid/shortid.dart';
+import 'package:mkombozi_mobile/utils/utils.dart';
 
 class SalaryAdvanceRequest extends NetworkRequest<SalaryAdvanceResponse> {
 
@@ -32,12 +32,12 @@ class SalaryAdvanceRequest extends NetworkRequest<SalaryAdvanceResponse> {
     'mobile': user.mobile,
     'subscriber': account.subscriberId,
     'source': '1', // SOURCE = MOBILE
-    'request_id': shortid.generate(),
+    'request_id': Utils.randomId(),
     'net_salary': netSalary.toString(),
     'amount': amount.toString(),
     'subscriber_company': '',
     'description': 'Salary Advance',
-    'retrievalReferenceNumber': shortid.generate(),
+    'retrievalReferenceNumber': Utils.randomId(),
     'consent': '1',
     'requested_service': 'SAL',
     'day_of_the_month': '0',

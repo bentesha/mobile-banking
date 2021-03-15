@@ -3,7 +3,7 @@ import 'package:mkombozi_mobile/models/account.dart';
 import 'package:mkombozi_mobile/models/user.dart';
 import 'package:mkombozi_mobile/networking/network_request.dart';
 import 'package:mkombozi_mobile/networking/network_response.dart';
-import 'package:shortid/shortid.dart';
+import 'package:mkombozi_mobile/utils/utils.dart';
 
 class LoanApplicationRequest extends NetworkRequest<NetworkResponse> {
   LoanApplicationRequest(
@@ -38,13 +38,13 @@ class LoanApplicationRequest extends NetworkRequest<NetworkResponse> {
         'mobile': user.mobile,
         'subscriber': account.subscriberId,
         'source': '1', // SOURCE = MOBILE
-        'request_id': shortid.generate(),
+        'request_id': Utils.randomId(),
         'net_salary': netSalary.toString(),
         'amount': amount.toString(),
         'subscriber_company': '',
         'company': company,
         'description': description,
-        'retrievalReferenceNumber': shortid.generate(),
+        'retrievalReferenceNumber': Utils.randomId(),
         'consent': '1',
         'requested_service': '201',
         'day_of_the_month': '0',

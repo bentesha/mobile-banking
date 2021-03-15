@@ -8,7 +8,7 @@ import 'package:mkombozi_mobile/models/user.dart';
 import 'package:mkombozi_mobile/networking/network_request.dart';
 import 'package:mkombozi_mobile/networking/network_response.dart';
 import 'package:mkombozi_mobile/networking/payment_response.dart';
-import 'package:shortid/shortid.dart';
+import 'package:mkombozi_mobile/utils/utils.dart';
 
 abstract class PaymentRequest extends NetworkRequest<PaymentResponse> {
 
@@ -30,9 +30,9 @@ abstract class PaymentRequest extends NetworkRequest<PaymentResponse> {
     'mobile': user.mobile,
     'subscriber': account.subscriberId,
     'source': '1',
-    'request_id': shortid.generate(),
+    'request_id': Utils.randomId(),
     'amount': amount.toString(),
-    'retrievalReferenceNumber': shortid.generate(),
+    'retrievalReferenceNumber': Utils.randomId(),
     'savePayee': savePayee ? '1' : '0',
     'reference': reference,
   };

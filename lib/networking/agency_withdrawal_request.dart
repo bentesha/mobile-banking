@@ -6,7 +6,7 @@ import 'package:mkombozi_mobile/models/user.dart';
 import 'package:mkombozi_mobile/networking/agency_withdrawal_response.dart';
 import 'package:mkombozi_mobile/networking/network_request.dart';
 import 'package:mkombozi_mobile/networking/network_response.dart';
-import 'package:shortid/shortid.dart';
+import 'package:mkombozi_mobile/utils/utils.dart';
 
 class AgencyWithdrawalRequest extends NetworkRequest<AgencyWithdrawalResponse> {
 
@@ -44,11 +44,11 @@ class AgencyWithdrawalRequest extends NetworkRequest<AgencyWithdrawalResponse> {
     'mobile': user.mobile,
     'subscriber': account.subscriberId,
     'source': '1',
-    'request_id': shortid.generate(),
+    'request_id': Utils.randomId(),
     'amount': amount.toString(),
     'save_payee': '1',
     'agent_account_number': agent.account,
-    'retrievalReferenceNumber': shortid.generate(),
+    'retrievalReferenceNumber': Utils.randomId(),
     'reference': ''
   };
 

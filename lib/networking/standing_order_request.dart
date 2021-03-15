@@ -6,7 +6,7 @@ import 'package:mkombozi_mobile/models/user.dart';
 import 'package:mkombozi_mobile/networking/network_request.dart';
 import 'package:mkombozi_mobile/networking/network_response.dart';
 import 'package:mkombozi_mobile/networking/standing_order_response.dart';
-import 'package:shortid/shortid.dart';
+import 'package:mkombozi_mobile/utils/utils.dart';
 
 class StandingOrderRequest extends NetworkRequest<StandingOrderResponse> {
 
@@ -42,8 +42,8 @@ class StandingOrderRequest extends NetworkRequest<StandingOrderResponse> {
     'mobile': user.mobile,
     'subscriber': account.subscriberId,
     'source': '1', // SOURCE MOBILE
-    'request_id': shortid.generate(),
-    'retrievalReferenceNumber': shortid.generate(),
+    'request_id': Utils.randomId(),
+    'retrievalReferenceNumber': Utils.randomId(),
     'consent': '1',
     'repayment_duration': '0',
     'firstExecutionDate': DateFormat('d-M-yyyy').format(firstExecutionDate),

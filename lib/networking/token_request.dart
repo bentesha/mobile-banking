@@ -5,7 +5,7 @@ import 'package:mkombozi_mobile/models/user.dart';
 import 'package:mkombozi_mobile/networking/network_request.dart';
 import 'package:mkombozi_mobile/networking/network_response.dart';
 import 'package:mkombozi_mobile/networking/token_response.dart';
-import 'package:shortid/shortid.dart';
+import 'package:mkombozi_mobile/utils/utils.dart';
 
 class TokenRequest extends NetworkRequest<TokenResponse> {
   TokenRequest({@required this.account, @required this.user});
@@ -20,7 +20,7 @@ class TokenRequest extends NetworkRequest<TokenResponse> {
     'mobile': user.mobile,
     'subscriber': account.subscriberId,
     'source': '1', // SOURCE MOBILE
-    'request_id': shortid.generate()
+    'request_id': Utils.randomId()
   };
 
   @override

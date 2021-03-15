@@ -5,7 +5,7 @@ import 'package:mkombozi_mobile/networking/full_statement_request.dart';
 import 'package:mkombozi_mobile/networking/network_request.dart';
 import 'package:mkombozi_mobile/networking/network_response.dart';
 import 'package:mkombozi_mobile/networking/statement_response.dart';
-import 'package:shortid/shortid.dart';
+import 'package:mkombozi_mobile/utils/utils.dart';
 
 abstract class StatementRequest extends NetworkRequest<StatementResponse> {
 
@@ -45,6 +45,6 @@ abstract class StatementRequest extends NetworkRequest<StatementResponse> {
         'mobile': user.mobile,
         'subscriber': account.subscriberId,
         'source': '1', // SOURCE = MOBILE
-        'request_id': shortid.generate()
+        'request_id': Utils.randomId()
       };
 }

@@ -4,7 +4,7 @@ import 'package:mkombozi_mobile/models/user.dart';
 import 'package:mkombozi_mobile/networking/balance_response.dart';
 import 'package:mkombozi_mobile/networking/network_request.dart';
 import 'package:mkombozi_mobile/networking/network_response.dart';
-import 'package:shortid/shortid.dart';
+import 'package:mkombozi_mobile/utils/utils.dart';
 
 class BalanceRequest extends NetworkRequest<BalanceResponse> {
 
@@ -28,7 +28,7 @@ class BalanceRequest extends NetworkRequest<BalanceResponse> {
     'mobile': user.mobile,
     'subscriber': account.subscriberId,
     'source': SOURCE_MOBILE, // SOURCE = MOBILE
-    'request_id': shortid.generate()
+    'request_id': Utils.randomId()
   };
 
   @override

@@ -5,7 +5,7 @@ import 'package:mkombozi_mobile/models/account.dart';
 import 'package:mkombozi_mobile/models/user.dart';
 import 'package:mkombozi_mobile/networking/network_request.dart';
 import 'package:mkombozi_mobile/networking/network_response.dart';
-import 'package:shortid/shortid.dart';
+import 'package:mkombozi_mobile/utils/utils.dart';
 
 class ChequeBookRequest extends NetworkRequest<NetworkResponse> {
 
@@ -34,7 +34,7 @@ class ChequeBookRequest extends NetworkRequest<NetworkResponse> {
     'pin': pin,
     'source': '1',
     'requested_service': 'CHQ',
-    'request_id': shortid.generate()
+    'request_id': Utils.randomId()
   };
 
   @override

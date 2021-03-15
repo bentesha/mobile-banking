@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:mkombozi_mobile/models/account.dart';
 import 'package:mkombozi_mobile/models/user.dart';
 import 'package:mkombozi_mobile/networking/statement_request.dart';
-import 'package:shortid/shortid.dart';
+import 'package:mkombozi_mobile/utils/utils.dart';
 
 class MiniStatementRequest extends StatementRequest {
 
@@ -19,7 +19,7 @@ class MiniStatementRequest extends StatementRequest {
   @override
   Map<String, dynamic> get params {
     final params = super.params;
-    params['retrievalReferenceNumber'] = shortid.generate();
+    params['retrievalReferenceNumber'] = Utils.randomId();
     return params;
   }
 
