@@ -33,11 +33,10 @@ class ChequeBookRequest extends NetworkRequest<NetworkResponse> {
     'subscriber': account.subscriberId,
     'pin': pin,
     'source': '1',
-    'requested_service': 'CHQ',
     'request_id': Utils.randomId()
   };
 
   @override
-  String get serviceId => '203';
+  String get serviceId => '204';
 
 }
