@@ -6,6 +6,7 @@ import 'package:mkombozi_mobile/helpers/formatters.dart';
 import 'package:mkombozi_mobile/models/account.dart';
 import 'package:mkombozi_mobile/models/service.dart';
 import 'package:mkombozi_mobile/networking/bill_payment_request.dart';
+import 'package:mkombozi_mobile/networking/general_payment_request.dart';
 import 'package:mkombozi_mobile/services/login_service.dart';
 import 'package:mkombozi_mobile/widgets/account_selector.dart';
 import 'package:mkombozi_mobile/widgets/form_cell_divider.dart';
@@ -130,12 +131,19 @@ class _StepTwo extends WorkflowItem {
       return false;
     }
     final loginService = Provider.of<LoginService>(context, listen: false);
-    final request = BillPaymentRequest();
+    final request = _data.service.mti == 'PAYSOLN'
+      ? GeneralPaymentRequest()
+      : BillPaymentRequest();
+
     request.account = _data.account;
     request.service = _data.service;
     request.pin = pin;
     request.user = loginService.currentUser;
     request.referenceNumber = _data.referenceNumber;
+
+    if (request is GeneralPaymentRequest) {
+      request.destinationTransactinId = null;
+    }
     final amount = double.parse(_data._amount.replaceAll(',', ''));
     request.amount = double.parse(_data._amount.replaceAll(',', ''));
     request.reference = _data.reference;
