@@ -71,7 +71,7 @@ class _StepOne extends WorkflowItem {
     }
 
     // If agent number has not changed, skip resolving agent information
-    if (_data.agentNumber == _data.agent?.account) {
+    if (_data.agentNumber == _data.agent?.number) {
       return true;
     }
 
@@ -86,7 +86,7 @@ class _StepOne extends WorkflowItem {
           title: 'Agent Not Found');
       return false;
     }
-
+    _data.agent = response.agent;
     return true;
   }
 
@@ -190,8 +190,6 @@ class _StepTwo extends WorkflowItem {
                           label: 'Agent Number', value: _data.agentNumber),
                       LabelValueCell(
                           label: 'Agent Name', value: _data.agent.name),
-                      LabelValueCell(
-                          label: 'Agent Bank', value: _data.agent.bankName)
                     ])))
       ],
     );

@@ -20,12 +20,10 @@ class ResolveAgentRequest extends NetworkRequest<ResolveAgentResponse> {
     final result = ResolveAgentResponse(code, message);
     result.description = response['description'];
 
-    if (result.code == 200 && response['agent_name'] != null) {
+    if (result.code == 200 && response['resolved_name'] != null) {
       final agent = Agent();
-      agent.name = response['agent_name'];
-      agent.bankName = response['bank_name'];
-      agent.branchName = response['bank_branch'];
-      agent.account = response['agent_account'];
+      agent.number = agentNumber;
+      agent.name = response['resolved_name'];
       result.agent = agent;
     }
 
@@ -34,13 +32,11 @@ class ResolveAgentRequest extends NetworkRequest<ResolveAgentResponse> {
 
   @override
   Map<String, dynamic> get params => {
-    'agent_id': agentNumber,
-    'subscriber': account.subscriberId
+    'reference_to_resolve': agentNumber,
+    'channel_route': '4',
+    'institution': NetworkRequest.INSTITUTION_ID
   };
 
   @override
-  String get serviceId => '9';
-
-
-
+  String get serviceId => '8';
 }

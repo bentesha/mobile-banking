@@ -1,9 +1,7 @@
 
 class Agent {
 
-  String account;
+  String number;
   String name;
-  String bankName;
-  String branchName;
 
 }

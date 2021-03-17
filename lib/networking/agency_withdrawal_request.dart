@@ -37,7 +37,7 @@ class AgencyWithdrawalRequest extends NetworkRequest<AgencyWithdrawalResponse> {
 
   @override
   Map<String, dynamic> get params => {
-    'agent_id': agent.account,
+    'agent_id': agent.number,
     'account_number': account.accountNumber,
     'pin': pin,
     'institution': account.institutionId,
@@ -46,12 +46,9 @@ class AgencyWithdrawalRequest extends NetworkRequest<AgencyWithdrawalResponse> {
     'source': '1',
     'request_id': Utils.randomId(),
     'amount': amount.toString(),
-    'save_payee': '1',
-    'agent_account_number': agent.account,
     'retrievalReferenceNumber': Utils.randomId(),
-    'reference': ''
   };
 
   @override
-  String get serviceId => '108';
+  String get serviceId => '112';
 }
