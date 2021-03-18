@@ -146,7 +146,7 @@ class OfflineDatabase {
   }
 
   Future<List<Bank>> getBanks() async {
-    final result = await _db.query('bank');
+    final result = await _db.query('bank', where: 'eft_id IS NOT NULL');
     return result.map((entry) => Bank.fromMap(entry)).toList();
   }
 
@@ -228,7 +228,8 @@ class OfflineDatabase {
       CREATE TABLE bank (
         bin TEXT PRIMARY KEY,
         name TEXT,
-        logo TEXT
+        logo TEXT,
+        eft_id TEXT
       )
     ''';
 

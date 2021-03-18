@@ -3,11 +3,9 @@
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:mkombozi_mobile/models/service.dart';
 import 'package:mkombozi_mobile/models/wallet_or_bank.dart';
 import 'package:mkombozi_mobile/services/account_service.dart';
 import 'package:mkombozi_mobile/widgets/progress_view.dart';
-import 'package:mkombozi_mobile/widgets/service_logo.dart';
 import 'package:provider/provider.dart';
 
 class BankOrWalletListPage extends StatelessWidget {

@@ -5,10 +5,14 @@ import 'package:mkombozi_mobile/dialogs/pin_code_dialog.dart';
 import 'package:mkombozi_mobile/formatters/decimal_input_formatter.dart';
 import 'package:mkombozi_mobile/helpers/utils.dart';
 import 'package:mkombozi_mobile/models/account.dart';
+import 'package:mkombozi_mobile/models/bank.dart';
+import 'package:mkombozi_mobile/models/branch.dart';
 import 'package:mkombozi_mobile/models/wallet_or_bank.dart';
+import 'package:mkombozi_mobile/networking/eft_request.dart';
 import 'package:mkombozi_mobile/networking/send_money_request.dart';
 import 'package:mkombozi_mobile/services/login_service.dart';
 import 'package:mkombozi_mobile/widgets/account_selector.dart';
+import 'package:mkombozi_mobile/widgets/branch_selector_cell.dart';
 import 'package:mkombozi_mobile/widgets/form_cell_divider.dart';
 import 'package:mkombozi_mobile/widgets/form_cell_input.dart';
 import 'package:mkombozi_mobile/widgets/label_value_cell.dart';
@@ -54,8 +58,9 @@ class _StepOne extends WorkflowItem {
   @override
   Future<bool> moveNext(context) async {
     String message;
-
-    if (_data._account == null) {
+    if (_data.walletOrBank is Bank && _data.branch == null) {
+      message = 'Select branch';
+    } else if (_data._account == null) {
       message = 'Account is required';
     } else if (_data.walletOrBank == null) {
       message = 'Service is required';
@@ -97,6 +102,27 @@ class _StepOne extends WorkflowItem {
                       _notifier.value = value;
                     }),
                 FormCellDivider(height: 32),
+                _data.walletOrBank is Bank
+                ? Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    BranchSelectorCell(
+                      label: 'Banch',
+                      hintText: 'Select Branch',
+                      icon: Icon(Icons.house),
+                      account: _data.account,
+                      bank: _data.walletOrBank as Bank,
+                      value: _data.branch,
+                      onChanged: (value) {
+                        print(value?.name ?? 'no name');
+                        _data.branch = value;
+                      },
+                    ),
+                    FormCellDivider()
+                  ],
+                )
+                : SizedBox(height: 0, width: 0),
                 AccountSelector(
                   label: 'Pay from account',
                   value: _data.account,
@@ -151,14 +177,19 @@ class _StepTwo extends WorkflowItem {
       return false;
     }
     final user = Provider.of<LoginService>(context, listen: false);
-    final request = SendMoneyRequest();
-    request.walletOrBank = _data._walletOrBank;
+    final request = _data.walletOrBank is Bank
+        ? EFTRequest()
+        : SendMoneyRequest();
+    request.walletOrBank = _data.walletOrBank;
     request.account = _data._account;
     request.pin = pin;
     request.user = user.currentUser;
     request.referenceNumber = _data.referenceNumber;
     request.amount = Utils.stringToDouble(_data.amount);
     request.reference = _data._referenceNumber;
+    if (request is EFTRequest) {
+      request.branch = _data.branch;
+    }
 
     final response = await request.send();
     if (response.code == 200) {
@@ -203,6 +234,11 @@ class _StepTwo extends WorkflowItem {
                     children: [
                       LabelValueCell(
                           label: 'Send to', value: _data.walletOrBank.name),
+                      _data.branch != null
+                      ? LabelValueCell(
+                        label: 'Branch', value: _data.branch.name
+                      )
+                      : SizedBox(height: 0, width: 0),
                       LabelValueCell(
                           label: _data.walletOrBank.isWallet
                               ? 'Phone number'
@@ -225,6 +261,7 @@ class _StepTwo extends WorkflowItem {
 
 class _FormData {
   WalletOrBank _walletOrBank;
+  Branch _branch;
   Account _account;
   String _amount;
   String _referenceNumber;
@@ -238,6 +275,13 @@ class _FormData {
   set walletOrBank(value) {
     isDirty = true;
     _walletOrBank = value;
+  }
+
+  Branch get branch => _branch;
+
+  set branch (Branch value) {
+    isDirty = true;
+    _branch = value;
   }
 
   Account get account => _account;
