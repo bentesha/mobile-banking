@@ -1,11 +1,15 @@
+
 import 'package:flutter/material.dart';
 import 'package:mkombozi_mobile/dialogs/message_dialog.dart';
 import 'package:mkombozi_mobile/dialogs/pin_code_dialog.dart';
 import 'package:mkombozi_mobile/formatters/decimal_input_formatter.dart';
 import 'package:mkombozi_mobile/helpers/utils.dart';
 import 'package:mkombozi_mobile/models/account.dart';
+import 'package:mkombozi_mobile/models/fixed_deposit.dart';
 import 'package:mkombozi_mobile/networking/loan_application_request.dart';
 import 'package:mkombozi_mobile/services/login_service.dart';
+import 'package:mkombozi_mobile/widgets/account_selector.dart';
+import 'package:mkombozi_mobile/widgets/fixed_deposit_selector.dart';
 import 'package:mkombozi_mobile/widgets/form_cell_divider.dart';
 import 'package:mkombozi_mobile/widgets/form_cell_dropdown.dart';
 import 'package:mkombozi_mobile/widgets/form_cell_input.dart';
@@ -48,9 +52,12 @@ class _StepOne extends WorkflowItem {
 
   @override
   Future<bool> moveNext(context) async {
+    print('isFixedDeposit ${_data.isFixedDeposit}');
+    print('fixedDeposit: ${_data.fixedDeposit != null}');
     String message;
-
-    if (_data.netSalary == null || _data.netSalary.isEmpty) {
+    if (_data.isFixedDeposit && _data.fixedDeposit == null) {
+      message = 'Select fixed deposit';
+    } else if (_data.netSalary == null || _data.netSalary.isEmpty) {
       message = 'Net salary is required';
     } else if (_data.description == null || _data.description.isEmpty) {
       message = 'Enter description';
@@ -74,6 +81,43 @@ class _StepOne extends WorkflowItem {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        AccountSelector(
+          label: 'Account',
+          value: _data.account,
+          onChanged: (value) {
+            if (_data.account != value) {
+              _data.fixedDeposit = null;
+              _data.account = value;
+              Workflow.of(context).updateState();
+            }
+          },
+        ),
+        FormCellDivider(),
+        FormCellDropDown(
+          label: 'Loan Type',
+          options: ['Normal Loan', 'Fixed Deposit'],
+          value: _data.isFixedDeposit ? 'Fixed Deposit' : 'Normal Loan',
+          onChanged: (value) {
+            _data.isFixedDeposit = value == 'Fixed Deposit';
+            if (!_data.isFixedDeposit) {
+              _data.fixedDeposit = null;
+            }
+            Workflow.of(context).updateState();
+          },
+        ),
+        FormCellDivider(),
+        _data.isFixedDeposit
+          ? Column(
+            children: [
+              FixedDepositSelector(
+                label: 'Fixed Deposit',
+                accountNumber: _data.account.accountNumber,
+                value: _data.fixedDeposit,
+                onChanged: (value) => _data.fixedDeposit = value,
+              ),
+              FormCellDivider()]
+          )
+          : SizedBox(height: 0, width: 0),
         FormCellInput(
             onChanged: (value) => _data.netSalary = value,
             label: 'Net Salary',
@@ -87,7 +131,7 @@ class _StepOne extends WorkflowItem {
         FormCellInput(
             onChanged: (value) => _data.description = value,
             label: 'Description',
-            hintText: 'Load description',
+            hintText: 'Loan description',
             initialValue: _data.description,
             icon: Icon(Icons.attach_money)),
         FormCellDivider(),
@@ -133,6 +177,7 @@ class _StepTwo extends WorkflowItem {
     final user = Provider.of<LoginService>(context, listen: false).currentUser;
     final request = LoanApplicationRequest(
         account: _data.account,
+        fixedDeposit: _data.fixedDeposit,
         user: user,
         pin: pin,
         netSalary: Utils.stringToDouble(_data.netSalary),
@@ -177,7 +222,15 @@ class _StepTwo extends WorkflowItem {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       LabelValueCell(
+                          label: 'Account', value: _data.account.maskedNumber),
+                      LabelValueCell(
                           label: 'Net Salary', value: _data.netSalary),
+                      LabelValueCell(
+                          label: 'Loan Type', value: _data.isFixedDeposit ? 'Fixed Deposit' : 'Normal Loan'),
+                      _data.isFixedDeposit
+                        ? LabelValueCell(
+                          label: 'Fixed Deposit', value: _data.fixedDeposit.toString())
+                        : SizedBox(height: 0, width: 0),
                       LabelValueCell(
                           label: 'Description', value: _data.description),
                       LabelValueCell(label: 'Company', value: _data.company),
@@ -200,12 +253,19 @@ class _FormData {
   String _netSalary;
   String _description;
   String _company;
+  bool _isFixedDeposit = false;
+  FixedDeposit _fixedDeposit;
   String _duration;
   bool isDirty = false;
 
   _FormData(this._account);
 
   Account get account => _account;
+
+  set account(Account value) {
+    _account = value;
+    isDirty = true;
+  }
 
   String get description => _description;
 
@@ -226,6 +286,20 @@ class _FormData {
   set netSalary(String value) {
     isDirty = true;
     _netSalary = value;
+  }
+
+  bool get isFixedDeposit => _isFixedDeposit;
+
+  set isFixedDeposit(bool value) {
+    isDirty = true;
+    _isFixedDeposit = value;
+  }
+
+  FixedDeposit get fixedDeposit => _fixedDeposit;
+
+  set fixedDeposit(FixedDeposit value) {
+    isDirty = true;
+    _fixedDeposit = value;
   }
 
   String get amount => _amount;

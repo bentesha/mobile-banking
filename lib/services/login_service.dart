@@ -1,10 +1,11 @@
 
-import 'package:flutter/cupertino.dart';
 import 'package:mkombozi_mobile/data/offline_database.dart';
 import 'package:mkombozi_mobile/models/device.dart';
+import 'package:mkombozi_mobile/models/fixed_deposit.dart';
 import 'package:mkombozi_mobile/models/service.dart';
 import 'package:mkombozi_mobile/models/user.dart';
 import 'package:mkombozi_mobile/networking/config_request.dart';
+import 'package:mkombozi_mobile/networking/list_fixed_deposit_request.dart';
 import 'package:mkombozi_mobile/networking/login_request.dart';
 import 'package:mkombozi_mobile/networking/login_response.dart';
 
@@ -38,6 +39,21 @@ class LoginService {
         await _db.saveInstitutions(configResponse.institutions);
         combinedServices.addAll(configResponse.services);
         combinedServices.addAll(configResponse.coreServices);
+
+        // Fetch user fixed deposits
+        for (final account in loginResponse.accounts) {
+          final results = <FixedDeposit>[];
+          final fdRequest = ListFixedDepositRequest();
+          fdRequest.pin = pin;
+          fdRequest.account = account;
+
+          final fdResponse = await fdRequest.send();
+          if (fdResponse.code == 200) {
+            results.addAll(fdResponse.fixedDeposits);
+          }
+          await _db.saveFixedDeposits(results);
+          print('Total fixed deposits saved: ${results.length}');
+        }
       }
       await _db.saveServices(combinedServices);
     }

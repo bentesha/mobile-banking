@@ -26,6 +26,11 @@ abstract class Workflow<TState> extends StatefulWidget {
   @protected
   TState createWorkflowState();
 
+  static WorkflowState<TState> of<TState>(BuildContext context) {
+    assert(context != null);
+    return context.findAncestorStateOfType<WorkflowState<TState>>();
+  }
+
 }
 
 class WorkflowState<TState> extends State<Workflow<TState>> {
@@ -41,14 +46,8 @@ class WorkflowState<TState> extends State<Workflow<TState>> {
     super.initState();
   }
 
-  static WorkflowState<TState> of<TState>(BuildContext context) {
-    assert(context != null);
-    return context.findAncestorStateOfType<WorkflowState>();
-  }
-
-  void updateState(TState state) {
+  void updateState() {
     setState(() {
-      data = state;
     });
   }
 

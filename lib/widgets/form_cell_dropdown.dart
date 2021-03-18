@@ -42,7 +42,8 @@ class _PageState extends State<FormCellDropDown> {
   build(context) => FormCell(
       label: widget.label,
       icon: widget.icon,
-      child: DropdownButton<String>(
+      child: DropdownButtonFormField<String>(
+        decoration: InputDecoration.collapsed(hintText: widget.label),
         isExpanded: true,
         value: _value,
         onChanged: _handleValueChanged,

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:mkombozi_mobile/models/account.dart';
 import 'package:mkombozi_mobile/models/bank.dart';
 import 'package:mkombozi_mobile/models/device.dart';
+import 'package:mkombozi_mobile/models/fixed_deposit.dart';
 import 'package:mkombozi_mobile/models/institution.dart';
 import 'package:mkombozi_mobile/models/service.dart';
 import 'package:mkombozi_mobile/models/user.dart';
@@ -160,6 +161,23 @@ class OfflineDatabase {
     });
   }
 
+  Future<List<FixedDeposit>> getFixedDeposits(String accountNumber) async {
+    final rows = await _db.query('fixed_deposit', where: 'account_number = ?', whereArgs: [accountNumber]);
+    return rows.map((data) => FixedDeposit.fromMap(data)).toList();
+  }
+
+  Future<void> saveFixedDeposits(List<FixedDeposit> fixedDeposits) async {
+    if (fixedDeposits == null || fixedDeposits.length == 0) {
+      return;
+    }
+    return _db.transaction((txn) {
+      final batch = txn.batch();
+      batch.delete('fixed_deposit');
+      fixedDeposits.forEach((fd) => batch.insert('fixed_deposit', fd.toMap()));
+      return batch.commit(noResult: true);
+    });
+  }
+
   void _onCreate(Database db, int version) async {
     final userTable = '''
       CREATE TABLE user (
@@ -241,6 +259,16 @@ class OfflineDatabase {
       )
     ''';
 
+    final fdTable = '''
+      CREATE TABLE fixed_deposit (
+        receipt_id TEXT PRIMARY KEY,
+        account_number TEXT NOT NULL,
+        currency TEXT,
+        mature_date TEXT,
+        amount REAL DEFAULT 0
+      )
+    ''';
+
     final batch = db.batch();
 
     batch.execute(userTable);
@@ -250,6 +278,7 @@ class OfflineDatabase {
     batch.execute(institutionTable);
     batch.execute(bankTable);
     batch.execute(walletTable);
+    batch.execute(fdTable);
 
     await batch.commit(noResult: true);
   }
