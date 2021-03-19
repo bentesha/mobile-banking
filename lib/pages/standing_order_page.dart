@@ -97,6 +97,7 @@ class _StepOne extends WorkflowItem {
         WalletOrBankSelector(
           label: 'To bank',
           icon: Icon(Icons.account_balance_sharp),
+          bankOnly: true,
           walletOrBank: _data.bank,
           onChanged: (value) {
             _data.bank = value as Bank;
@@ -134,6 +135,14 @@ class _StepOne extends WorkflowItem {
             textAlign: TextAlign.right,
             initialValue: _data.amount,
             icon: Icon(Icons.attach_money)),
+        FormCellDivider(),
+        FormCellDropDown(
+          label: 'Frequency',
+          options: ['D', 'M', 'Y'],
+          icon: Icon(Icons.refresh),
+          value: _data.frequency,
+          onChanged: (value) => _data.frequency = value,
+        ),
         FormCellDivider(),
         FormCellInput(
           label: 'Number of Executions',
@@ -182,6 +191,7 @@ class _StepTwo extends WorkflowItem {
         pin: pin,
         dayOfMonth: _data.dayOfMonth,
         firstExecutionDate: _data.startDate,
+        frequency: _data.frequency,
         noOfExecutions: int.parse(_data.numberOfExecutions),
         amount: double.parse(_data.amount.replaceAll(',', '')),
         recipientAccount: _data.accountNumber,
@@ -264,6 +274,7 @@ class _FormData {
   DateTime _startDate;
   String _dayOfMonth;
   String _amount;
+  String _frequency = 'M';
   bool isDirty = false;
 
   _FormData(this._account);
@@ -301,6 +312,13 @@ class _FormData {
   set startDate(DateTime value) {
     isDirty = true;
     _startDate = value;
+  }
+
+  String get frequency => _frequency;
+
+  set frequency(String value) {
+    isDirty = true;
+    _frequency = value;
   }
 
   String get numberOfExecutions => _numberOfExecutions;

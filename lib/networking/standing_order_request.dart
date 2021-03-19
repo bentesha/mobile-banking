@@ -19,6 +19,7 @@ class StandingOrderRequest extends NetworkRequest<StandingOrderResponse> {
     @required this.user,
     @required this.pin,
     @required this.dayOfMonth,
+    @required this.frequency,
     @required this.firstExecutionDate,
     @required this.noOfExecutions,
     @required this.amount,
@@ -31,6 +32,7 @@ class StandingOrderRequest extends NetworkRequest<StandingOrderResponse> {
   final User user;
   final String pin;
   final String dayOfMonth;
+  final String frequency;
   final DateTime firstExecutionDate;
   final int noOfExecutions;
   final double amount;
@@ -47,7 +49,7 @@ class StandingOrderRequest extends NetworkRequest<StandingOrderResponse> {
     'request_id': Utils.randomId(),
     'retrievalReferenceNumber': Utils.randomId(),
     'firstExecutionDate': DateFormat('d-M-yyyy').format(firstExecutionDate),
-    'frequency': 'M',
+    'frequency': frequency,
     'noOfExecutions': noOfExecutions.toString(),
     'amount': amount.toString(),
     'description': 'Standing Order',

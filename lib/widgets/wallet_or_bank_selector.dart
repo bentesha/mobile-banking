@@ -3,17 +3,19 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:mkombozi_mobile/models/wallet_or_bank.dart';
+import 'package:mkombozi_mobile/pages/bank_or_wallet_list.dart';
 import 'package:mkombozi_mobile/pages/select_wallet_or_bank.dart';
 import 'package:mkombozi_mobile/widgets/form_cell.dart';
 
 class WalletOrBankSelector extends StatefulWidget {
 
-  WalletOrBankSelector({@required this.label, @required this.icon, @required this.walletOrBank, @required this.onChanged});
+  WalletOrBankSelector({@required this.label, @required this.icon, @required this.walletOrBank, this.bankOnly = false, @required this.onChanged});
 
   final String label;
   final Widget icon;
   final WalletOrBank walletOrBank;
   final ValueChanged<WalletOrBank> onChanged;
+  final bool bankOnly;
 
   @override
   createState() => _WalletOrBankSelectorState();
@@ -61,7 +63,9 @@ class _WalletOrBankSelectorState extends State<WalletOrBankSelector> {
   );
 
   _handleOnCellPressed(BuildContext context) async {
-    final walletOrBank = await SelectWalletOrBankPage.navigateTo(context);
+    final walletOrBank = widget.bankOnly
+      ? await BankOrWalletListPage.navigateTo(context, 'bank')
+      : await SelectWalletOrBankPage.navigateTo(context);
     if (walletOrBank == null) {
       return;
     }
