@@ -2,6 +2,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 import 'package:mkombozi_mobile/models/account.dart';
+import 'package:mkombozi_mobile/models/bank.dart';
+import 'package:mkombozi_mobile/models/branch.dart';
 import 'package:mkombozi_mobile/models/user.dart';
 import 'package:mkombozi_mobile/networking/network_request.dart';
 import 'package:mkombozi_mobile/networking/network_response.dart';
@@ -12,18 +14,20 @@ class StandingOrderRequest extends NetworkRequest<StandingOrderResponse> {
 
   StandingOrderRequest({
     @required this.account,
+    @required this.bank,
+    @required this.branch,
     @required this.user,
     @required this.pin,
     @required this.dayOfMonth,
     @required this.firstExecutionDate,
     @required this.noOfExecutions,
     @required this.amount,
-    @required this.recipientAccount,
-    @required this.institutionName,
-    @required this.institutionCode
+    @required this.recipientAccount
   });
   
   final Account account;
+  final Bank bank;
+  final Branch branch;
   final User user;
   final String pin;
   final String dayOfMonth;
@@ -31,8 +35,6 @@ class StandingOrderRequest extends NetworkRequest<StandingOrderResponse> {
   final int noOfExecutions;
   final double amount;
   final String recipientAccount;
-  final String institutionName;
-  final String institutionCode;
 
   @override
   Map<String, dynamic> get params => {
@@ -44,17 +46,16 @@ class StandingOrderRequest extends NetworkRequest<StandingOrderResponse> {
     'source': '1', // SOURCE MOBILE
     'request_id': Utils.randomId(),
     'retrievalReferenceNumber': Utils.randomId(),
-    'consent': '1',
-    'repayment_duration': '0',
     'firstExecutionDate': DateFormat('d-M-yyyy').format(firstExecutionDate),
     'frequency': 'M',
     'noOfExecutions': noOfExecutions.toString(),
-    'subscriber_company': '',
     'amount': amount.toString(),
-    'recipient_account': recipientAccount,
     'description': 'Standing Order',
-    'receivingInstitutionName': institutionName,
-    'receivingInstitutionCode': institutionCode
+    'destination_account': recipientAccount,
+    'standingOrderType': 'external',
+    'receivingInstitutionName': bank.name,
+    'receivingInstitutionCode': bank.eftId,
+    'creditAccountBranch': branch.code
   };
 
   @override

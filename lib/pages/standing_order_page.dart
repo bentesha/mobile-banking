@@ -5,14 +5,18 @@ import 'package:mkombozi_mobile/dialogs/pin_code_dialog.dart';
 import 'package:mkombozi_mobile/formatters/decimal_input_formatter.dart';
 import 'package:mkombozi_mobile/formatters/number_input_formatter.dart';
 import 'package:mkombozi_mobile/models/account.dart';
+import 'package:mkombozi_mobile/models/bank.dart';
+import 'package:mkombozi_mobile/models/branch.dart';
 import 'package:mkombozi_mobile/networking/standing_order_request.dart';
 import 'package:mkombozi_mobile/services/login_service.dart';
 import 'package:mkombozi_mobile/widgets/account_selector.dart';
+import 'package:mkombozi_mobile/widgets/branch_selector_cell.dart';
 import 'package:mkombozi_mobile/widgets/form_cell_date.dart';
 import 'package:mkombozi_mobile/widgets/form_cell_divider.dart';
 import 'package:mkombozi_mobile/widgets/form_cell_dropdown.dart';
 import 'package:mkombozi_mobile/widgets/form_cell_input.dart';
 import 'package:mkombozi_mobile/widgets/label_value_cell.dart';
+import 'package:mkombozi_mobile/widgets/wallet_or_bank_selector.dart';
 import 'package:mkombozi_mobile/widgets/workflow.dart';
 import 'package:mkombozi_mobile/widgets/workflow_item.dart';
 import 'package:provider/provider.dart';
@@ -59,10 +63,10 @@ class _StepOne extends WorkflowItem {
       message = 'Enter amount';
     } else if (_data.accountNumber == null || _data.accountNumber.isEmpty) {
       message = 'Enter account number';
-    } else if (_data.institutionName == null || _data.institutionName.isEmpty) {
-      message = 'Enter institution name';
-    } else if (_data.institutionCode == null || _data.institutionCode.isEmpty) {
-      message = 'Enter institution code';
+    } else if (_data.bank == null) {
+      message = 'Select destination bank';
+    } else if (_data.branch == null) {
+      message = 'Select destination branch';
     } else if (_data.numberOfExecutions == null ||
         _data.numberOfExecutions.isEmpty) {
       message = 'Enter number of executions';
@@ -90,15 +94,28 @@ class _StepOne extends WorkflowItem {
           onChanged: (value) => _data.account = value,
         ),
         FormCellDivider(),
-        FormCellInput(
-            onChanged: (value) => _data.amount = value,
-            label: 'Amount',
-            inputFormatters: [DecimalInputFormatter()],
-            hintText: 'Standing order amount',
-            inputType: TextInputType.number,
-            textAlign: TextAlign.right,
-            initialValue: _data.amount,
-            icon: Icon(Icons.attach_money)),
+        WalletOrBankSelector(
+          label: 'To bank',
+          icon: Icon(Icons.account_balance_sharp),
+          walletOrBank: _data.bank,
+          onChanged: (value) {
+            _data.bank = value as Bank;
+            Workflow.of(context).updateState();
+          }
+        ),
+        FormCellDivider(),
+        BranchSelectorCell(
+          label: 'Branch',
+          value: _data.branch,
+          hintText: 'Select branch',
+          icon: Icon(Icons.house_siding),
+          account: _data.account,
+          bank: _data.bank,
+          onChanged: (value) {
+            _data.branch = value;
+            Workflow.of(context).updateState();
+          }
+        ),
         FormCellDivider(),
         FormCellInput(
           label: 'Account Number',
@@ -109,19 +126,14 @@ class _StepOne extends WorkflowItem {
         ),
         FormCellDivider(),
         FormCellInput(
-          label: 'Institution Name',
-          initialValue: _data.institutionName,
-          onChanged: (value) => _data.institutionName = value,
-          hintText: 'Name of receiving institution',
-          icon: Icon(Icons.account_balance_sharp),
-        ),
-        FormCellDivider(),
-        FormCellInput(
-            label: 'Institution Code',
-            hintText: 'Code of the receiving institution',
-            initialValue: _data.institutionCode,
-            onChanged: (value) => _data.institutionCode = value,
-            icon: Icon(Icons.tag)),
+            onChanged: (value) => _data.amount = value,
+            label: 'Amount',
+            inputFormatters: [DecimalInputFormatter()],
+            hintText: 'Standing order amount',
+            inputType: TextInputType.number,
+            textAlign: TextAlign.right,
+            initialValue: _data.amount,
+            icon: Icon(Icons.attach_money)),
         FormCellDivider(),
         FormCellInput(
           label: 'Number of Executions',
@@ -171,16 +183,16 @@ class _StepTwo extends WorkflowItem {
         dayOfMonth: _data.dayOfMonth,
         firstExecutionDate: _data.startDate,
         noOfExecutions: int.parse(_data.numberOfExecutions),
-        amount: double.parse(_data.amount),
+        amount: double.parse(_data.amount.replaceAll(',', '')),
         recipientAccount: _data.accountNumber,
-        institutionName: _data.institutionName,
-        institutionCode: _data.institutionCode);
+        bank: _data.bank,
+        branch: _data.branch);
     final response = await request.send();
     if (response.code == 200) {
       await MessageDialog.show(
           context: context,
-          message: 'Standing order was successfully set',
-          title: 'Success');
+          message: response.description,
+          title: response.message);
       return true;
     }
 
@@ -217,15 +229,15 @@ class _StepTwo extends WorkflowItem {
                     children: [
                       LabelValueCell(
                           label: 'Pay from', value: _data.account.maskedNumber),
-                      LabelValueCell(label: 'Amount', value: _data.amount),
+                      LabelValueCell(
+                          label: 'To Bank',
+                          value: _data.bank.name),
+                      LabelValueCell(
+                          label: 'Branch',
+                          value: _data.branch.name),
                       LabelValueCell(
                           label: 'Account Number', value: _data.accountNumber),
-                      LabelValueCell(
-                          label: 'Institution Name',
-                          value: _data.institutionName),
-                      LabelValueCell(
-                          label: 'Institution Code',
-                          value: _data.institutionCode),
+                      LabelValueCell(label: 'Amount', value: _data.amount),
                       LabelValueCell(
                           label: 'Number of executions',
                           value: _data.numberOfExecutions),
@@ -245,9 +257,9 @@ class _StepTwo extends WorkflowItem {
 
 class _FormData {
   Account _account;
+  Bank _bank;
+  Branch _branch;
   String _accountNumber;
-  String _institutionName;
-  String _institutionCode;
   String _numberOfExecutions;
   DateTime _startDate;
   String _dayOfMonth;
@@ -261,6 +273,20 @@ class _FormData {
   set accountNumber(String value) {
     isDirty = true;
     _accountNumber = value;
+  }
+
+  Bank get bank => _bank;
+
+  set bank(Bank value) {
+    _bank = value;
+    isDirty = true;
+  }
+
+  Branch get branch => _branch;
+
+  set branch(Branch value) {
+    _branch = value;
+    isDirty = true;
   }
 
   String get dayOfMonth => _dayOfMonth;
@@ -282,20 +308,6 @@ class _FormData {
   set numberOfExecutions(String value) {
     isDirty = true;
     _numberOfExecutions = value;
-  }
-
-  String get institutionCode => _institutionCode;
-
-  set institutionCode(String value) {
-    isDirty = true;
-    _institutionCode = value;
-  }
-
-  String get institutionName => _institutionName;
-
-  set institutionName(String value) {
-    isDirty = true;
-    _institutionName = value;
   }
 
   Account get account => _account;
