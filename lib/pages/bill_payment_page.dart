@@ -1,12 +1,16 @@
+
 import 'package:flutter/material.dart';
 import 'package:mkombozi_mobile/dialogs/message_dialog.dart';
 import 'package:mkombozi_mobile/dialogs/pin_code_dialog.dart';
 import 'package:mkombozi_mobile/formatters/decimal_input_formatter.dart';
 import 'package:mkombozi_mobile/helpers/formatters.dart';
 import 'package:mkombozi_mobile/models/account.dart';
+import 'package:mkombozi_mobile/models/bill_reference_info.dart';
 import 'package:mkombozi_mobile/models/service.dart';
 import 'package:mkombozi_mobile/networking/bill_payment_request.dart';
 import 'package:mkombozi_mobile/networking/general_payment_request.dart';
+import 'package:mkombozi_mobile/networking/resolve_bill_number_request.dart';
+import 'package:mkombozi_mobile/networking/resolve_bill_number_response.dart';
 import 'package:mkombozi_mobile/services/login_service.dart';
 import 'package:mkombozi_mobile/widgets/account_selector.dart';
 import 'package:mkombozi_mobile/widgets/form_cell_divider.dart';
@@ -69,7 +73,88 @@ class _StepOne extends WorkflowItem {
       MessageDialog.showFormError(context: context, message: message);
     }
 
-    return message == null;
+    if (message != null) {
+      return false;
+    }
+    final referenceInfo = await _resolveReference(context);
+    _data.referenceInfo = referenceInfo;
+    return referenceInfo != null;
+  }
+
+  Future<BillReferenceInfo> _resolveReference(BuildContext context) {
+    final request = ResolveBillNumberRequest();
+    BillReferenceInfo info;
+    request.reference = _data.referenceNumber;
+    request.account = _data.account;
+    return showDialog<BillReferenceInfo>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Text('Payment Details'),
+        actions: [
+          FlatButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('CANCEL')
+          ),
+          FlatButton(
+            onPressed: () => Navigator.of(context).pop(info),
+            child: Text('CONTINUE')
+          )
+        ],
+        content: FutureBuilder<ResolveBillNumberResponse>(
+          future: request.send(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Container(
+                padding: EdgeInsets.only(top: 40),
+                height: 100,
+                child: Center(
+                  child: CircularProgressIndicator()
+                )
+              );
+            } else if (snapshot.hasError) {
+              return SizedBox(
+                height: 100,
+                child: Text('Could not resolve number')
+              );
+            }
+
+            final response = snapshot.data;
+            if (response.code != 200) {
+              return SizedBox(
+                height: 100,
+                child: Text('Reference number not found!')
+              );
+            }
+
+            info = response.info;
+
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  title: Text('Name'),
+                  subtitle: Text(info.resolvedName), 
+                ),
+                ListTile(
+                  title: Text('Institution'),
+                  subtitle: Text(info.institutionName)
+                ),
+                ListTile(
+                  title: Text('Amount'),
+                  subtitle: Text(info.amount)
+                ),
+                ListTile(
+                  title: Text('Phone Number'),
+                  subtitle: Text(info.phoneNumber)
+                )
+              ],
+            );
+          }
+        )
+      ),
+    );
   }
 
   @override
@@ -131,10 +216,12 @@ class _StepTwo extends WorkflowItem {
       return false;
     }
     final loginService = Provider.of<LoginService>(context, listen: false);
-    final request = _data.service.mti == 'PAYSOLN'
+    final request = _data.referenceNumber != null
       ? GeneralPaymentRequest()
       : BillPaymentRequest();
-
+    if (request is GeneralPaymentRequest) {
+      request.destinationTransactinId =_data.referenceInfo.destinationTransactionId;
+    }
     request.account = _data.account;
     request.service = _data.service;
     request.pin = pin;
@@ -142,18 +229,16 @@ class _StepTwo extends WorkflowItem {
     request.referenceNumber = _data.referenceNumber;
 
     if (request is GeneralPaymentRequest) {
-      request.destinationTransactinId = null;
+      request.destinationTransactinId = _data.referenceInfo.destinationTransactionId;
     }
-    final amount = double.parse(_data._amount.replaceAll(',', ''));
+
     request.amount = double.parse(_data._amount.replaceAll(',', ''));
     request.reference = _data.reference;
 
     final response = await request.send();
     if (response.code == 200) {
-      String message =
-          '${Formatter.formatCurrency(amount)} successfully sent to ${_data.service.name}';
       await MessageDialog.show(
-          context: context, message: message, title: 'Success');
+          context: context, message: response.description, title: response.message);
       return true;
     }
 
@@ -188,7 +273,24 @@ class _StepTwo extends WorkflowItem {
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      LabelValueCell(
+                      _data.referenceInfo != null
+                      ? Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            LabelValueCell(
+                              label: 'Name',
+                              value: _data.referenceInfo.resolvedName
+                            ),
+                            LabelValueCell(
+                              label: 'Institution',
+                              value: _data.referenceInfo.institutionName
+                            ),
+                            LabelValueCell(
+                              label: 'Phone Number',
+                              value: _data.referenceInfo.phoneNumber
+                            )]
+                      )
+                      : LabelValueCell(
                           label: 'Send to', value: _data.service.name),
                       LabelValueCell(
                           label: 'Pay from', value: _data.account.maskedNumber),
@@ -213,6 +315,7 @@ class _FormData {
   String _amount;
   String _referenceNumber;
   String _reference;
+  BillReferenceInfo _referenceInfo;
   bool isDirty = false;
 
   _FormData(this._service, this._account);
@@ -243,6 +346,13 @@ class _FormData {
   set referenceNumber(value) {
     isDirty = true;
     _referenceNumber = value;
+  }
+
+  BillReferenceInfo get referenceInfo => _referenceInfo;
+
+  set referenceInfo(BillReferenceInfo value) {
+    isDirty = true;
+    _referenceInfo = value;
   }
 
   String get reference => _reference;

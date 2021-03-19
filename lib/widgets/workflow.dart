@@ -39,6 +39,9 @@ class WorkflowState<TState> extends State<Workflow<TState>> {
   TState data;
   List<WorkflowItem> items = [];
   bool loading = false;
+  bool enableActionBar = true;
+
+  bool get _actionBarEnabled => enableActionBar && !loading;
 
   @override
   initState() {
@@ -71,8 +74,17 @@ class WorkflowState<TState> extends State<Workflow<TState>> {
       return;
     }
     final item = items[index];
-    if (!await item.moveNext(context)) {
-      return;
+    setState(() {
+      enableActionBar = false;
+    }); 
+    try {
+      if (!await item.moveNext(context)) {
+        return;
+      }
+    } finally {
+      setState(() {
+        enableActionBar = true;
+      }); 
     }
     if (index + 1 < items.length) {
       setState(() {
@@ -110,7 +122,7 @@ class WorkflowState<TState> extends State<Workflow<TState>> {
         child: ActionButton(
           caption: (index == 0 ? widget.actionLabel : widget.confirmLabel) ?? '',
           loading: loading,
-          onPressed: loading ? null : _handleActionButton,
+          onPressed: _actionBarEnabled ? _handleActionButton : null,
         )
       ),
       body: SafeArea(

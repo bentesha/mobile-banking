@@ -12,7 +12,7 @@ class GeneralPaymentRequest extends PaymentRequest {
   @override
   Map<String, dynamic> get params {
     final map = super.params;
-    map['destination_account'] = destinationTransactinId;
+    map['destination_transaction_id'] = destinationTransactinId;
     map['payment_reference'] = referenceNumber;
 
     return map;
