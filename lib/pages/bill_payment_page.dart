@@ -241,7 +241,7 @@ class _StepTwo extends WorkflowItem {
       return false;
     }
     final loginService = Provider.of<LoginService>(context, listen: false);
-    final request = _data.referenceNumber != null
+    final request = _data.service.mti == ResolveBillNumberRequest.MTI_PAYMENT_SOLUTION
       ? GeneralPaymentRequest()
       : BillPaymentRequest();
     if (request is GeneralPaymentRequest) {
