@@ -193,7 +193,7 @@ class _StepOne extends WorkflowItem {
         ),
         FormCellDivider(),
         FormCellInput(
-          label: 'Reference',
+          label: 'Description',
           initialValue: _data.reference,
           onChanged: (value) => _data.reference = value,
           hintText: 'For your reference',
