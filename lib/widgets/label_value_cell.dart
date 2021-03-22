@@ -13,15 +13,20 @@ class LabelValueCell extends StatelessWidget {
     padding: EdgeInsets.symmetric(vertical: 16),
     child: Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label ?? '',
           style: Theme.of(context).textTheme.bodyText2.copyWith(
             color: Colors.grey.shade600
           )
         ),
-        Text(value ?? '',
-          style: Theme.of(context).textTheme.bodyText2.copyWith(
-            fontWeight: FontWeight.bold
+        SizedBox(width: 32),
+        Flexible(
+          child: Text(value ?? '',
+            style: Theme.of(context).textTheme.bodyText2.copyWith(
+              fontWeight: FontWeight.bold
+            ),
+            overflow: TextOverflow.visible,
           )
         )
       ],
