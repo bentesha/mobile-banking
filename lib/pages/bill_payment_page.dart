@@ -3,13 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:mkombozi_mobile/dialogs/message_dialog.dart';
 import 'package:mkombozi_mobile/dialogs/pin_code_dialog.dart';
 import 'package:mkombozi_mobile/formatters/decimal_input_formatter.dart';
-import 'package:mkombozi_mobile/helpers/formatters.dart';
 import 'package:mkombozi_mobile/models/account.dart';
+import 'package:mkombozi_mobile/models/airtime_service.dart';
 import 'package:mkombozi_mobile/models/bill_reference_info.dart';
 import 'package:mkombozi_mobile/models/service.dart';
 import 'package:mkombozi_mobile/networking/bill_payment_request.dart';
 import 'package:mkombozi_mobile/networking/general_payment_request.dart';
-import 'package:mkombozi_mobile/networking/resolve_agent_request.dart';
 import 'package:mkombozi_mobile/networking/resolve_bill_number_request.dart';
 import 'package:mkombozi_mobile/networking/resolve_bill_number_response.dart';
 import 'package:mkombozi_mobile/services/login_service.dart';
@@ -101,6 +100,11 @@ class _StepOne extends WorkflowItem {
       account: _data.account,
       mti: _data.service.mti
     );
+    final service = _data.service;
+    if (service is AirtimeService) {
+      request.utility = service.utility;
+    }
+
     BillReferenceInfo info;
     return showDialog<BillReferenceInfo>(
       context: context,
@@ -149,14 +153,18 @@ class _StepOne extends WorkflowItem {
                   title: Text('Name'),
                   subtitle: Text(info.resolvedName), 
                 ),
-                ListTile(
+                info.institutionName != null 
+                ? ListTile(
                   title: Text('Institution'),
                   subtitle: Text(info.institutionName)
-                ),
-                ListTile(
+                )
+                : SizedBox(height: 0),
+                info.amount != null
+                ? ListTile(
                   title: Text('Amount'),
                   subtitle: Text(info.amount)
                 )
+                : SizedBox(height: 0)
               ],
             );
           }

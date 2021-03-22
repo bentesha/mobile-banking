@@ -16,12 +16,14 @@ class ResolveBillNumberRequest extends NetworkRequest<ResolveBillNumberResponse>
   ResolveBillNumberRequest({
     @required this.reference,
     @required this.account,
-    @required this.mti
+    @required this.mti,
+    this.utility
   });
 
   final String reference;
   final Account account;
   final String mti;
+  String utility;
 
   @override
   NetworkResponse createResponse(Map<String, dynamic> data) {
@@ -36,7 +38,7 @@ class ResolveBillNumberRequest extends NetworkRequest<ResolveBillNumberResponse>
     info.resolvedName = response['resolved_name'] ?? response['pyr_name'];
     info.paymentType = response['payment_type'] ?? 'PARTIAL';
     info.institutionName = response['institution_name'] ?? response['sp_name'];
-    info.institutionDescription = response['institution_description'] ?? '';
+    info.institutionDescription = response['institution_description'];
     info.amount = response['amount'] ?? response['min_pay_amount'];
     // info.phoneNumber = response['phone'];
     info.destinationTransactionId = response['destination_transaction_id'];
@@ -47,7 +49,7 @@ class ResolveBillNumberRequest extends NetworkRequest<ResolveBillNumberResponse>
   @override
   Map<String, dynamic> get params {
     String channel = '10';
-    String utility;
+    String utility = this.utility;
     if (mti == MTI_LUKU) {
       channel = '7';
       utility = 'LUKU';
@@ -55,6 +57,8 @@ class ResolveBillNumberRequest extends NetworkRequest<ResolveBillNumberResponse>
     if (mti == MTI_GEPG) {
       channel = '3';
       utility = 'GEPG';
+    } else if (mti == MTI_AIRTIME) {
+      channel = '1';
     }
 
 

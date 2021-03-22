@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:mkombozi_mobile/models/account.dart';
+import 'package:mkombozi_mobile/models/airtime_service.dart';
 import 'package:mkombozi_mobile/models/bank.dart';
 import 'package:mkombozi_mobile/models/device.dart';
 import 'package:mkombozi_mobile/models/fixed_deposit.dart';
@@ -7,7 +8,6 @@ import 'package:mkombozi_mobile/models/institution.dart';
 import 'package:mkombozi_mobile/models/service.dart';
 import 'package:mkombozi_mobile/models/user.dart';
 import 'package:mkombozi_mobile/models/wallet.dart';
-import 'package:mkombozi_mobile/models/wallet_or_bank.dart';
 import 'package:sqflite/sqflite.dart';
 
 class OfflineDatabase {
@@ -84,6 +84,21 @@ class OfflineDatabase {
   Future<List<Service>> getCoreServices() async {
     final result = await _db.query('service', where: 'core_id = 1');
     return result.map((entry) => Service.fromMap(entry)).toList();
+  }
+
+  Future<List<AirtimeService>> getAirtimeRechargeServices() async {
+    final services = await getServices();
+    final rechargeService = services
+      .where((service) => service.mti == 'TOP')
+      .first;
+    final wallets = await getWallets();
+    final utilities = ['TIGO-PESA', 'MPESA', 'AIRTEL-MONEY'];
+    return utilities.map((utility) {
+      final wallet = wallets.where((wallet) => wallet.bin == utility).first;
+      final data = rechargeService.toMap();
+      data['logo'] = wallet.logo;
+      return AirtimeService.fromMap(data, utility);
+    }).toList();
   }
 
   Future<List<Service>> getGeneralServices() async {

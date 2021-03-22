@@ -28,6 +28,10 @@ class AccountService {
   }
 
   Future<List<Service>> getServiceByAppCategory(String id) async {
+    if (id == '3') {
+      // Return airtime service
+      return _db.getAirtimeRechargeServices();
+    }
     return _db.getServiceByAppCategory(id);
   }
 
