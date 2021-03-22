@@ -86,13 +86,18 @@ class _StepOne extends WorkflowItem {
       ResolveBillNumberRequest.MTI_DAWASCO,
     ].contains(_data.service.mti);
 
+    final mustResolve = [
+      ResolveBillNumberRequest.MTI_PAYMENT_SOLUTION,
+      ResolveBillNumberRequest.MTI_DAWASCO,
+    ];
+
     if (!shouldResolve) {
       return true;
     }
 
     final referenceInfo = await _resolveReference(context);
     _data.referenceInfo = referenceInfo;
-    return referenceInfo != null || _data.service.mti != ResolveBillNumberRequest.MTI_GEPG;
+    return referenceInfo != null || !mustResolve.contains(_data.service.mti);
   }
 
   Future<BillReferenceInfo> _resolveReference(BuildContext context) {
