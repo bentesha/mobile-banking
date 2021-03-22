@@ -105,7 +105,7 @@ class _PageState extends State<ChequeBookRequestPage> {
                               child: AccountSelector(
                                 label: 'Account',
                                 value: _account,
-                                onChanged: (value) => _account = value,
+                                onChanged: (value) => setState(() => _account = value),
                               )),
                           Divider()
                         ],
