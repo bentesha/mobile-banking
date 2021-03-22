@@ -51,8 +51,6 @@ class _StepOne extends WorkflowItem {
     String message;
 
     if (_data._account == null) {
-      message = 'Account is required';
-    } else if (_data.netSalary == null || _data.netSalary.isEmpty) {
       message = 'Enter net salary';
     } else if (_data.amount == null || _data.amount.isEmpty) {
       message = 'Enter amount';
@@ -75,16 +73,6 @@ class _StepOne extends WorkflowItem {
           value: _data.account,
           onChanged: (value) => _data.account = value,
         ),
-        FormCellDivider(),
-        FormCellInput(
-            onChanged: (value) => _data.netSalary = value,
-            label: 'Net Salary',
-            inputFormatters: [DecimalInputFormatter()],
-            hintText: 'Your net salary amount',
-            inputType: TextInputType.number,
-            textAlign: TextAlign.right,
-            initialValue: _data.netSalary,
-            icon: Icon(Icons.attach_money)),
         FormCellDivider(),
         FormCellInput(
             onChanged: (value) => _data.amount = value,
@@ -116,7 +104,6 @@ class _StepTwo extends WorkflowItem {
         account: _data.account,
         user: user,
         pin: pin,
-        netSalary: Utils.stringToDouble(_data.netSalary),
         amount: Utils.stringToDouble(_data.amount));
 
     final response = await request.send();
@@ -162,8 +149,6 @@ class _StepTwo extends WorkflowItem {
                       LabelValueCell(
                           label: 'Account', value: _data.account.maskedNumber),
                       LabelValueCell(
-                          label: 'Net Salary', value: _data.netSalary),
-                      LabelValueCell(
                           label: 'Requested Advance', value: _data.amount)
                     ])))
       ],
@@ -177,7 +162,6 @@ class _StepTwo extends WorkflowItem {
 class _FormData {
   Account _account;
   String _amount;
-  String _netSalary;
   bool isDirty = false;
 
   _FormData(this._account);
@@ -187,13 +171,6 @@ class _FormData {
   set account(value) {
     isDirty = true;
     _account = value;
-  }
-
-  String get netSalary => _netSalary;
-
-  set netSalary(String value) {
-    isDirty = true;
-    _netSalary = value;
   }
 
   String get amount => _amount;

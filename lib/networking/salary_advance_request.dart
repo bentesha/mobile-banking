@@ -14,14 +14,12 @@ class SalaryAdvanceRequest extends NetworkRequest<SalaryAdvanceResponse> {
       @required this.account,
       @required this.user,
       @required this.pin,
-      @required this.netSalary,
       @required this.amount
     });
 
   final Account account;
   final User user;
   final String pin;
-  final double netSalary;
   final double amount;
 
   @override
@@ -33,7 +31,6 @@ class SalaryAdvanceRequest extends NetworkRequest<SalaryAdvanceResponse> {
     'subscriber': account.subscriberId,
     'source': '1', // SOURCE = MOBILE
     'request_id': Utils.randomId(),
-    'net_salary': netSalary.toString(),
     'amount': amount.toString(),
     'subscriber_company': '',
     'description': 'Salary Advance',
