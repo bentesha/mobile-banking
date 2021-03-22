@@ -8,6 +8,7 @@ import 'package:mkombozi_mobile/services/login_service.dart';
 import 'package:mkombozi_mobile/widgets/account_selector.dart';
 import 'package:mkombozi_mobile/widgets/action_button.dart';
 import 'package:mkombozi_mobile/widgets/progress_view.dart';
+import 'package:mkombozi_mobile/widgets/workflow.dart';
 import 'package:provider/provider.dart';
 
 class AtmCardRequestPage extends StatefulWidget {
@@ -105,7 +106,7 @@ class _PageState extends State<AtmCardRequestPage> {
                               child: AccountSelector(
                                 label: 'Account',
                                 value: _account,
-                                onChanged: (value) => _account = value,
+                                onChanged: (value) => setState(() => _account = value),
                               )),
                           Divider()
                         ],
