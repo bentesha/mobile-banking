@@ -12,6 +12,7 @@ import 'package:mkombozi_mobile/networking/network_response.dart';
 abstract class NetworkRequest<T extends NetworkResponse> {
 
   static const INSTITUTION_ID = '30000003';
+  static const INSTITUTION_BIN = '502933';
   static const END_POINT = 'http://41.188.154.221:8000/api/mobile/';
   static const SERVICE_IMAGE_BASE_URL = '${END_POINT}service_logos/';
   static const BANK_IMAGE_BASE_URL = '${END_POINT}bank_logos/';

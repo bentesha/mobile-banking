@@ -16,7 +16,7 @@ class EFTRequest extends SendMoneyRequest {
     'pin': pin,
     'destination_institution_code': (walletOrBank as Bank).eftId,
     'destination_institution_name': walletOrBank.name,
-    'destination_branch_code': branch.code,
+    'destination_branch_code': branch?.code,
     'destination_account': referenceNumber,
     'destination_bank': (walletOrBank as Bank).bin,
     'mobile': user.mobile,

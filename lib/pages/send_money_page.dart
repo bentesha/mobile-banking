@@ -9,6 +9,7 @@ import 'package:mkombozi_mobile/models/bank.dart';
 import 'package:mkombozi_mobile/models/branch.dart';
 import 'package:mkombozi_mobile/models/wallet_or_bank.dart';
 import 'package:mkombozi_mobile/networking/eft_request.dart';
+import 'package:mkombozi_mobile/networking/network_request.dart';
 import 'package:mkombozi_mobile/networking/send_money_request.dart';
 import 'package:mkombozi_mobile/services/login_service.dart';
 import 'package:mkombozi_mobile/widgets/account_selector.dart';
@@ -58,7 +59,14 @@ class _StepOne extends WorkflowItem {
   @override
   Future<bool> moveNext(context) async {
     String message;
-    if (_data.walletOrBank is Bank && _data.branch == null) {
+    final branchRequired = _data.walletOrBank is Bank
+      && _data.walletOrBank.bin != NetworkRequest.INSTITUTION_BIN;
+    
+    if (!branchRequired) {
+      _data.branch = null;
+    }
+    
+    if (branchRequired && _data.branch == null) {
       message = 'Select branch';
     } else if (_data._account == null) {
       message = 'Account is required';
@@ -102,7 +110,7 @@ class _StepOne extends WorkflowItem {
                       _notifier.value = value;
                     }),
                 FormCellDivider(height: 32),
-                _data.walletOrBank is Bank
+                (_data.walletOrBank is Bank) && _data.walletOrBank.bin != NetworkRequest.INSTITUTION_BIN
                 ? Column(
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -177,7 +185,7 @@ class _StepTwo extends WorkflowItem {
       return false;
     }
     final user = Provider.of<LoginService>(context, listen: false);
-    final request = _data.walletOrBank is Bank
+    final request = _data.walletOrBank is Bank 
         ? EFTRequest()
         : SendMoneyRequest();
     request.walletOrBank = _data.walletOrBank;
