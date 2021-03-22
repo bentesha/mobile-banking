@@ -82,7 +82,8 @@ class _StepOne extends WorkflowItem {
       ResolveBillNumberRequest.MTI_GEPG,
       ResolveBillNumberRequest.MTI_LUKU,
       ResolveBillNumberRequest.MTI_PAYMENT_SOLUTION,
-      ResolveBillNumberRequest.MTI_AIRTIME
+      ResolveBillNumberRequest.MTI_AIRTIME,
+      ResolveBillNumberRequest.MTI_DAWASCO,
     ].contains(_data.service.mti);
 
     if (!shouldResolve) {

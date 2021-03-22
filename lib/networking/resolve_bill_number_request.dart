@@ -12,6 +12,7 @@ class ResolveBillNumberRequest extends NetworkRequest<ResolveBillNumberResponse>
   static const MTI_GEPG = 'GEPG';
   static const MTI_PAYMENT_SOLUTION = 'PAYSOLN';
   static const MTI_AIRTIME = 'TOP';
+  static const MTI_DAWASCO = 'DAWASCO';
 
   ResolveBillNumberRequest({
     @required this.reference,
@@ -57,6 +58,9 @@ class ResolveBillNumberRequest extends NetworkRequest<ResolveBillNumberResponse>
     if (mti == MTI_GEPG) {
       channel = '3';
       utility = 'GEPG';
+    } else if (mti == MTI_DAWASCO) {
+      channel = '7';
+      utility = 'DAWASCO';
     } else if (mti == MTI_AIRTIME) {
       channel = '1';
     }
