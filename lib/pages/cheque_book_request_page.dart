@@ -66,7 +66,7 @@ class _PageState extends State<ChequeBookRequestPage> {
   build(context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('ATM Card Request',
+          title: Text('Cheque Book Request',
               style: Theme.of(context).textTheme.headline6),
           backgroundColor: Colors.white,
           iconTheme:
