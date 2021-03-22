@@ -72,8 +72,6 @@ class _StepOne extends WorkflowItem {
       message = 'Enter number of executions';
     } else if (_data.startDate == null) {
       message = 'Enter start date';
-    } else if (_data.dayOfMonth == null || _data.dayOfMonth.isEmpty) {
-      message = 'Enter day of month';
     }
 
     if (message != null) {
@@ -163,14 +161,6 @@ class _StepOne extends WorkflowItem {
             date: _data.startDate,
             onChanged: (value) => _data.startDate = value,
             icon: Icon(Icons.date_range)),
-        FormCellDivider(),
-        FormCellDropDown(
-          label: 'Day of Month',
-          value: _data.dayOfMonth,
-          options: List.generate(31, (index) => (index + 1).toString()),
-          icon: Icon(Icons.date_range),
-          onChanged: (value) => _data.dayOfMonth = value,
-        )
       ],
     );
   }
@@ -192,7 +182,6 @@ class _StepTwo extends WorkflowItem {
         account: _data.account,
         user: user,
         pin: pin,
-        dayOfMonth: _data.dayOfMonth,
         firstExecutionDate: _data.startDate,
         frequency: _data.frequency,
         noOfExecutions: int.parse(_data.numberOfExecutions),
@@ -257,8 +246,6 @@ class _StepTwo extends WorkflowItem {
                       LabelValueCell(
                           label: 'Start date',
                           value: DateFormat.yMMMd().format(_data.startDate)),
-                      LabelValueCell(
-                          label: 'Day of month', value: _data.dayOfMonth)
                     ])))
       ],
     );
@@ -275,7 +262,6 @@ class _FormData {
   String _accountNumber;
   String _numberOfExecutions;
   DateTime _startDate;
-  String _dayOfMonth;
   String _amount;
   String _frequency = 'M';
   bool isDirty = false;
@@ -301,13 +287,6 @@ class _FormData {
   set branch(Branch value) {
     _branch = value;
     isDirty = true;
-  }
-
-  String get dayOfMonth => _dayOfMonth;
-
-  set dayOfMonth(String value) {
-    isDirty = true;
-    _dayOfMonth = value;
   }
 
   DateTime get startDate => _startDate;

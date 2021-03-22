@@ -18,7 +18,6 @@ class StandingOrderRequest extends NetworkRequest<StandingOrderResponse> {
     @required this.branch,
     @required this.user,
     @required this.pin,
-    @required this.dayOfMonth,
     @required this.frequency,
     @required this.firstExecutionDate,
     @required this.noOfExecutions,
@@ -31,7 +30,6 @@ class StandingOrderRequest extends NetworkRequest<StandingOrderResponse> {
   final Branch branch;
   final User user;
   final String pin;
-  final String dayOfMonth;
   final String frequency;
   final DateTime firstExecutionDate;
   final int noOfExecutions;
