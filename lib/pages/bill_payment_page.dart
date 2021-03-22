@@ -171,7 +171,10 @@ class _StepOne extends WorkflowItem {
         AccountSelector(
           label: 'Pay from account',
           value: _data.account,
-          onChanged: (value) => _data.account = value,
+          onChanged: (value) {
+            _data.account = value;
+            Workflow.of(context).updateState();
+          },
         ),
         FormCellDivider(),
         FormCellInput(
