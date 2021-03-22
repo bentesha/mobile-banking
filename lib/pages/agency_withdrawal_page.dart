@@ -98,7 +98,10 @@ class _StepOne extends WorkflowItem {
         AccountSelector(
           label: 'Account',
           value: _data.account,
-          onChanged: (value) => _data.account = value,
+          onChanged: (value) {
+            Workflow.of(context).updateState();
+            _data.account = value;
+          },
         ),
         FormCellDivider(),
         FormCellInput(
@@ -146,8 +149,8 @@ class _StepTwo extends WorkflowItem {
     if (response.code == 200) {
       await MessageDialog.show(
         context: context,
-        message: 'Transaction has been completed successfully',
-        title: 'Transaction Complete',
+        message: response.message,
+        title: response.description,
       );
       return true;
     }
