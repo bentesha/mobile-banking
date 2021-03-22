@@ -9,6 +9,7 @@ import 'package:mkombozi_mobile/models/bill_reference_info.dart';
 import 'package:mkombozi_mobile/models/service.dart';
 import 'package:mkombozi_mobile/networking/bill_payment_request.dart';
 import 'package:mkombozi_mobile/networking/general_payment_request.dart';
+import 'package:mkombozi_mobile/networking/resolve_agent_request.dart';
 import 'package:mkombozi_mobile/networking/resolve_bill_number_request.dart';
 import 'package:mkombozi_mobile/networking/resolve_bill_number_response.dart';
 import 'package:mkombozi_mobile/services/login_service.dart';
@@ -76,16 +77,31 @@ class _StepOne extends WorkflowItem {
     if (message != null) {
       return false;
     }
+
+    // Only resolve payment reference for these services
+    final shouldResolve = [
+      ResolveBillNumberRequest.MTI_GEPG,
+      ResolveBillNumberRequest.MTI_LUKU,
+      ResolveBillNumberRequest.MTI_PAYMENT_SOLUTION,
+      ResolveBillNumberRequest.MTI_AIRTIME
+    ].contains(_data.service.mti);
+
+    if (!shouldResolve) {
+      return true;
+    }
+
     final referenceInfo = await _resolveReference(context);
     _data.referenceInfo = referenceInfo;
-    return referenceInfo != null;
+    return referenceInfo != null || _data.service.mti != ResolveBillNumberRequest.MTI_GEPG;
   }
 
   Future<BillReferenceInfo> _resolveReference(BuildContext context) {
-    final request = ResolveBillNumberRequest();
+    final request = ResolveBillNumberRequest(
+      reference: _data.referenceNumber,
+      account: _data.account,
+      mti: _data.service.mti
+    );
     BillReferenceInfo info;
-    request.reference = _data.referenceNumber;
-    request.account = _data.account;
     return showDialog<BillReferenceInfo>(
       context: context,
       barrierDismissible: false,
@@ -93,12 +109,8 @@ class _StepOne extends WorkflowItem {
         title: Text('Payment Details'),
         actions: [
           FlatButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text('CANCEL')
-          ),
-          FlatButton(
             onPressed: () => Navigator.of(context).pop(info),
-            child: Text('CONTINUE')
+            child: Text('OK')
           )
         ],
         content: FutureBuilder<ResolveBillNumberResponse>(
@@ -144,10 +156,6 @@ class _StepOne extends WorkflowItem {
                 ListTile(
                   title: Text('Amount'),
                   subtitle: Text(info.amount)
-                ),
-                ListTile(
-                  title: Text('Phone Number'),
-                  subtitle: Text(info.phoneNumber)
                 )
               ],
             );
@@ -287,10 +295,6 @@ class _StepTwo extends WorkflowItem {
                             LabelValueCell(
                               label: 'Institution',
                               value: _data.referenceInfo.institutionName
-                            ),
-                            LabelValueCell(
-                              label: 'Phone Number',
-                              value: _data.referenceInfo.phoneNumber
                             )]
                       )
                       : LabelValueCell(
