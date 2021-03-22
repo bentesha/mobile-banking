@@ -57,8 +57,6 @@ class _StepOne extends WorkflowItem {
     String message;
     if (_data.isFixedDeposit && _data.fixedDeposit == null) {
       message = 'Select fixed deposit';
-    } else if (_data.netSalary == null || _data.netSalary.isEmpty) {
-      message = 'Net salary is required';
     } else if (_data.description == null || _data.description.isEmpty) {
       message = 'Enter description';
     } else if (_data.company == null || _data.company.isEmpty) {
@@ -119,16 +117,6 @@ class _StepOne extends WorkflowItem {
           )
           : SizedBox(height: 0, width: 0),
         FormCellInput(
-            onChanged: (value) => _data.netSalary = value,
-            label: 'Net Salary',
-            inputFormatters: [DecimalInputFormatter()],
-            hintText: 'Your net salary',
-            inputType: TextInputType.number,
-            textAlign: TextAlign.right,
-            initialValue: _data.netSalary,
-            icon: Icon(Icons.attach_money)),
-        FormCellDivider(),
-        FormCellInput(
             onChanged: (value) => _data.description = value,
             label: 'Description',
             hintText: 'Loan description',
@@ -180,7 +168,6 @@ class _StepTwo extends WorkflowItem {
         fixedDeposit: _data.fixedDeposit,
         user: user,
         pin: pin,
-        netSalary: Utils.stringToDouble(_data.netSalary),
         amount: Utils.stringToDouble(_data.amount),
         description: _data.description,
         company: _data.company,
@@ -224,8 +211,6 @@ class _StepTwo extends WorkflowItem {
                       LabelValueCell(
                           label: 'Account', value: _data.account.maskedNumber),
                       LabelValueCell(
-                          label: 'Net Salary', value: _data.netSalary),
-                      LabelValueCell(
                           label: 'Loan Type', value: _data.isFixedDeposit ? 'Fixed Deposit' : 'Normal Loan'),
                       _data.isFixedDeposit
                         ? LabelValueCell(
@@ -250,7 +235,6 @@ class _StepTwo extends WorkflowItem {
 class _FormData {
   Account _account;
   String _amount;
-  String _netSalary;
   String _description;
   String _company;
   bool _isFixedDeposit = false;
@@ -279,13 +263,6 @@ class _FormData {
   set company(String value) {
     isDirty = true;
     _company = value;
-  }
-
-  String get netSalary => _netSalary;
-
-  set netSalary(String value) {
-    isDirty = true;
-    _netSalary = value;
   }
 
   bool get isFixedDeposit => _isFixedDeposit;

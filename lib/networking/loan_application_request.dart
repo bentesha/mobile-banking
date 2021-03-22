@@ -11,7 +11,6 @@ class LoanApplicationRequest extends NetworkRequest<NetworkResponse> {
       {@required this.account,
       this.fixedDeposit,
       @required this.user,
-      @required this.netSalary,
       @required this.amount,
       @required this.description,
       @required this.company,
@@ -21,7 +20,6 @@ class LoanApplicationRequest extends NetworkRequest<NetworkResponse> {
   final Account account;
   final User user;
   final FixedDeposit fixedDeposit;
-  final double netSalary;
   final double amount;
   final String description;
   final String company;
@@ -42,7 +40,6 @@ class LoanApplicationRequest extends NetworkRequest<NetworkResponse> {
       'subscriber': account.subscriberId,
       'source': '1', // SOURCE = MOBILE
       'request_id': Utils.randomId(),
-      'net_salary': netSalary.toString(),
       'amount': amount.toString(),
       'subscriber_company': '',
       'company': company,
