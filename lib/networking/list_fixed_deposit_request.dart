@@ -31,6 +31,9 @@ class ListFixedDepositRequest extends NetworkRequest<ListFixedDepositResponse> {
     String description = response['description'];
     final result = ListFixedDepositResponse(code, message);
     result.description = description;
+    if (code != 200) {
+      return result;
+    }
     final list = asMapList(response['activeFDs']);
     result.fixedDeposits = list.map((data) {
       return FixedDeposit.fromNetwork(data)
