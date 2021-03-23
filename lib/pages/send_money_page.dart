@@ -3,14 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:mkombozi_mobile/dialogs/message_dialog.dart';
 import 'package:mkombozi_mobile/dialogs/pin_code_dialog.dart';
 import 'package:mkombozi_mobile/formatters/decimal_input_formatter.dart';
+import 'package:mkombozi_mobile/helpers/formatters.dart';
 import 'package:mkombozi_mobile/helpers/utils.dart';
 import 'package:mkombozi_mobile/models/account.dart';
 import 'package:mkombozi_mobile/models/bank.dart';
+import 'package:mkombozi_mobile/models/bill_reference_info.dart';
 import 'package:mkombozi_mobile/models/branch.dart';
 import 'package:mkombozi_mobile/models/wallet_or_bank.dart';
 import 'package:mkombozi_mobile/networking/eft_request.dart';
 import 'package:mkombozi_mobile/networking/network_request.dart';
 import 'package:mkombozi_mobile/networking/resolve_bill_number_request.dart';
+import 'package:mkombozi_mobile/networking/resolve_bill_number_response.dart';
 import 'package:mkombozi_mobile/networking/send_money_request.dart';
 import 'package:mkombozi_mobile/services/login_service.dart';
 import 'package:mkombozi_mobile/widgets/account_selector.dart';
@@ -21,6 +24,7 @@ import 'package:mkombozi_mobile/widgets/label_value_cell.dart';
 import 'package:mkombozi_mobile/widgets/wallet_or_bank_selector.dart';
 import 'package:mkombozi_mobile/widgets/workflow.dart';
 import 'package:mkombozi_mobile/widgets/workflow_item.dart';
+import 'package:mkombozi_mobile/widgets/workflow_progress_indicator.dart';
 import 'package:provider/provider.dart';
 
 class SendMoneyPage extends Workflow<_FormData> {
@@ -217,8 +221,47 @@ class _StepTwo extends WorkflowItem {
     return false;
   }
 
+  Future<void> _resolveName() async {
+    if (!_data.walletOrBank.isWallet &&
+      _data.walletOrBank.bin != NetworkRequest.INSTITUTION_BIN) {
+        return null;
+    } 
+
+    final request = ResolveBillNumberRequest(
+      account: _data.account,
+      reference: _data.reference,
+      mti: _data.walletOrBank.isWallet
+        ? _data.walletOrBank.bin
+        : NetworkRequest.INSTITUTION_BIN
+    );
+    final response = await request.send();
+    _data.info = response.info;
+  }
+
   @override
   Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: _resolveName(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return WorkflowProgressIndicator(
+            'Checking number..'
+          );
+        }
+
+        if (snapshot.connectionState == ConnectionState.done || snapshot.hasError) {
+          return _buildContent(context);
+        }
+
+        return Container();
+      }
+    );
+  }
+
+  Widget _buildContent(BuildContext context) {
+    final shouldResolveAgent = 
+      _data.walletOrBank.bin == NetworkRequest.INSTITUTION_BIN
+        || _data.walletOrBank.isWallet;
     return Column(
       children: [
         Row(children: [
@@ -233,7 +276,7 @@ class _StepTwo extends WorkflowItem {
           )
         ]),
         SizedBox(height: 32),
-        Ink(
+        Container(
             decoration:
                 BoxDecoration(border: Border.all(color: Colors.grey.shade300)),
             child: Padding(
@@ -253,18 +296,23 @@ class _StepTwo extends WorkflowItem {
                               ? 'Phone number'
                               : 'Account number',
                           value: _data.referenceNumber),
-                      _data.walletOrBank.bin == NetworkRequest.INSTITUTION_BIN
-                      ? _ResolvableLabelValueCell(
-                        label: 'Account Name',
-                        account: _data.account,
-                        reference: _data.referenceNumber,
+                      shouldResolveAgent
+                      ? LabelValueCell(
+                        label: _data.walletOrBank.isWallet ? 'Name' : 'Account Name',
+                        value: _data?.info?.resolvedName ?? 'Name not found'
                       )
                       : SizedBox(height: 0),
                       LabelValueCell(
                           label: 'Pay from', value: _data.account.maskedNumber),
                       LabelValueCell(label: 'Amount', value: _data.amount),
                       LabelValueCell(
-                          label: 'Reference', value: _data.reference)
+                          label: 'Reference', value: _data.reference),
+                      shouldResolveAgent
+                      ? LabelValueCell(
+                        label: 'Charge',
+                        value: Formatter.formatCurrency(_data?.info?.amount ?? 0)
+                      )
+                      : SizedBox(height: 0)
                     ])))
       ],
     );
@@ -279,18 +327,20 @@ class _ResolvableLabelValueCell extends StatelessWidget {
   _ResolvableLabelValueCell({
     @required this.label,
     @required this.account,
-    @required this.reference
+    @required this.reference,
+    @required this.mti,
   });
 
   final String label;
   final Account account;
   final String reference;
+  final String mti;
   
   Future<String> _resolveName() async {
     final request = ResolveBillNumberRequest(
       account: account,
       reference: reference,
-      mti: NetworkRequest.INSTITUTION_BIN
+      mti: mti
     );
     final response = await request.send();
     return response?.info?.resolvedName;
@@ -361,6 +411,7 @@ class _FormData {
   String _referenceNumber;
   String _reference;
   bool isDirty = false;
+  BillReferenceInfo info;
 
   _FormData(this._account, this._walletOrBank);
 
