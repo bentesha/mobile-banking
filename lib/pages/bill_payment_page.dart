@@ -58,6 +58,7 @@ class _StepOne extends WorkflowItem {
   @override
   Future<bool> moveNext(context) async {
     String message;
+    final requiresAmount = _data.service.mti != ResolveBillNumberRequest.MTI_PAYMENT_SOLUTION;
 
     if (_data.account == null) {
       message = 'Account is required';
@@ -65,7 +66,7 @@ class _StepOne extends WorkflowItem {
       message = 'Service is required';
     } else if (_data.referenceNumber == null || _data.referenceNumber.isEmpty) {
       message = 'Enter reference number';
-    } else if (_data.amount == null || _data.amount.isEmpty) {
+    } else if (requiresAmount && (_data.amount == null || _data.amount.isEmpty)) {
       message = 'Enter amount';
     }
 
@@ -97,6 +98,10 @@ class _StepOne extends WorkflowItem {
 
     final referenceInfo = await _resolveReference(context);
     _data.referenceInfo = referenceInfo;
+
+    if(!requiresAmount && referenceInfo != null) {
+      _data.amount = referenceInfo.amount ?? '0';
+    }
     return referenceInfo != null || !mustResolve.contains(_data.service.mti);
   }
 
@@ -206,17 +211,24 @@ class _StepOne extends WorkflowItem {
             initialValue: _data.referenceNumber,
             icon: Icon(Icons.money)),
         FormCellDivider(),
-        FormCellInput(
-          label: 'Amount to pay',
-          inputFormatters: [DecimalInputFormatter()],
-          initialValue: _data.amount?.toString(),
-          onChanged: (value) => _data.amount = value,
-          hintText: 'Enter amount to send. e.g 20,000',
-          inputType: TextInputType.number,
-          textAlign: TextAlign.right,
-          icon: Icon(Icons.attach_money),
-        ),
-        FormCellDivider(),
+        _data.service.mti != ResolveBillNumberRequest.MTI_PAYMENT_SOLUTION
+        ? Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            FormCellInput(
+              label: 'Amount to pay',
+              inputFormatters: [DecimalInputFormatter()],
+              initialValue: _data.amount?.toString(),
+              onChanged: (value) => _data.amount = value,
+              hintText: 'Enter amount to send. e.g 20,000',
+              inputType: TextInputType.number,
+              textAlign: TextAlign.right,
+              icon: Icon(Icons.attach_money),
+            ),
+            FormCellDivider()
+          ],
+        )
+        : SizedBox(height: 0),
         FormCellInput(
           label: 'Description',
           initialValue: _data.reference,
