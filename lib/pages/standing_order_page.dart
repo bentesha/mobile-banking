@@ -11,6 +11,7 @@ import 'package:mkombozi_mobile/networking/standing_order_request.dart';
 import 'package:mkombozi_mobile/services/login_service.dart';
 import 'package:mkombozi_mobile/widgets/account_selector.dart';
 import 'package:mkombozi_mobile/widgets/branch_selector_cell.dart';
+import 'package:mkombozi_mobile/widgets/currency_icon.dart';
 import 'package:mkombozi_mobile/widgets/form_cell_date.dart';
 import 'package:mkombozi_mobile/widgets/form_cell_divider.dart';
 import 'package:mkombozi_mobile/widgets/form_cell_dropdown.dart';
@@ -135,7 +136,7 @@ class _StepOne extends WorkflowItem {
             inputType: TextInputType.number,
             textAlign: TextAlign.right,
             initialValue: _data.amount,
-            icon: Icon(Icons.attach_money)),
+            icon: CurrencyIcon()),
         FormCellDivider(),
         FormCellDropDown(
           label: 'Frequency',

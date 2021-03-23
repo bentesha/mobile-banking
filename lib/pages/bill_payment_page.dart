@@ -13,6 +13,7 @@ import 'package:mkombozi_mobile/networking/resolve_bill_number_request.dart';
 import 'package:mkombozi_mobile/networking/resolve_bill_number_response.dart';
 import 'package:mkombozi_mobile/services/login_service.dart';
 import 'package:mkombozi_mobile/widgets/account_selector.dart';
+import 'package:mkombozi_mobile/widgets/currency_icon.dart';
 import 'package:mkombozi_mobile/widgets/form_cell_divider.dart';
 import 'package:mkombozi_mobile/widgets/form_cell_input.dart';
 import 'package:mkombozi_mobile/widgets/label_value_cell.dart';
@@ -223,7 +224,7 @@ class _StepOne extends WorkflowItem {
               hintText: 'Enter amount to send. e.g 20,000',
               inputType: TextInputType.number,
               textAlign: TextAlign.right,
-              icon: Icon(Icons.attach_money),
+              icon: CurrencyIcon(),
             ),
             FormCellDivider()
           ],

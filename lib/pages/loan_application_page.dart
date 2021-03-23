@@ -9,6 +9,7 @@ import 'package:mkombozi_mobile/models/fixed_deposit.dart';
 import 'package:mkombozi_mobile/networking/loan_application_request.dart';
 import 'package:mkombozi_mobile/services/login_service.dart';
 import 'package:mkombozi_mobile/widgets/account_selector.dart';
+import 'package:mkombozi_mobile/widgets/currency_icon.dart';
 import 'package:mkombozi_mobile/widgets/fixed_deposit_selector.dart';
 import 'package:mkombozi_mobile/widgets/form_cell_divider.dart';
 import 'package:mkombozi_mobile/widgets/form_cell_dropdown.dart';
@@ -93,6 +94,7 @@ class _StepOne extends WorkflowItem {
         FormCellDivider(),
         FormCellDropDown(
           label: 'Loan Type',
+          icon: Icon(Icons.category),
           options: ['Normal Loan', 'Fixed Deposit'],
           value: _data.isFixedDeposit ? 'Fixed Deposit' : 'Normal Loan',
           onChanged: (value) {
@@ -121,14 +123,14 @@ class _StepOne extends WorkflowItem {
             label: 'Description',
             hintText: 'Loan description',
             initialValue: _data.description,
-            icon: Icon(Icons.attach_money)),
+            icon: Icon(Icons.description)),
         FormCellDivider(),
         FormCellInput(
             onChanged: (value) => _data.company = value,
             label: 'Company',
             hintText: 'Your company name',
             initialValue: _data.company,
-            icon: Icon(Icons.attach_money)),
+            icon: Icon(Icons.business)),
         FormCellDivider(),
         FormCellInput(
             onChanged: (value) => _data.amount = value,
@@ -138,14 +140,14 @@ class _StepOne extends WorkflowItem {
             inputType: TextInputType.number,
             textAlign: TextAlign.right,
             initialValue: _data.amount,
-            icon: Icon(Icons.attach_money)),
+            icon: CurrencyIcon()),
         FormCellDivider(),
         FormCellDropDown(
             onChanged: (value) => _data.duration = value,
             value: _data.duration,
             label: 'Requested Duration (month)',
             options: List.generate(36, (index) => (index + 1).toString()),
-            icon: Icon(Icons.attach_money)),
+            icon: Icon(Icons.date_range)),
       ],
     );
   }

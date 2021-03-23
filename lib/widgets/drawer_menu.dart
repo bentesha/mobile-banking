@@ -19,7 +19,7 @@ class DrawerMenu extends StatelessWidget {
           buildItem(Icons.history_sharp, 'Full Statement', ActionType.fullStatement),
           buildItem(Icons.lightbulb, 'My LUKU Tokens', ActionType.lukuTokens),
           buildItem(Icons.money, 'Loan Application', ActionType.loanApplication),
-          buildItem(Icons.attach_money, 'Salary Advance', ActionType.salaryAdvance),
+          buildItem(Icons.payments, 'Salary Advance', ActionType.salaryAdvance),
           buildItem(Icons.comment_bank, 'Standing Order', ActionType.standingOrder),
           buildItem(Icons.credit_card, 'Request ATM Card', ActionType.requestAtmCard),
           buildItem(Icons.book_outlined, 'Request Cheque Book', ActionType.requestChequeBook),
