@@ -222,7 +222,7 @@ class _StepTwo extends WorkflowItem {
           )
         ]),
         SizedBox(height: 32),
-        Ink(
+        Container(
             decoration:
                 BoxDecoration(border: Border.all(color: Colors.grey.shade300)),
             child: Padding(
