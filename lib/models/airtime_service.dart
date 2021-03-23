@@ -7,6 +7,5 @@ class AirtimeService extends Service {
   AirtimeService.fromMap(Map<String, dynamic> data, this.utility)
       : super.fromMap(data);
 
-  get name => utility;
-  get description => 'Buy airtime for $utility';
+  get description => 'Buy airtime for $name';
 }

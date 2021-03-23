@@ -97,6 +97,7 @@ class OfflineDatabase {
       final wallet = wallets.where((wallet) => wallet.bin == utility).first;
       final data = rechargeService.toMap();
       data['logo'] = wallet.logo;
+      data['name'] = wallet.name;
       return AirtimeService.fromMap(data, utility);
     }).toList();
   }
