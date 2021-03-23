@@ -88,7 +88,7 @@ class _StepOne extends WorkflowItem {
 
     final mustResolve = [
       ResolveBillNumberRequest.MTI_PAYMENT_SOLUTION,
-      ResolveBillNumberRequest.MTI_DAWASCO,
+      ResolveBillNumberRequest.MTI_GEPG,
     ];
 
     if (!shouldResolve) {
