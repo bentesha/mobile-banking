@@ -23,6 +23,7 @@ class DrawerMenu extends StatelessWidget {
           buildItem(Icons.comment_bank, 'Standing Order', ActionType.standingOrder),
           buildItem(Icons.credit_card, 'Request ATM Card', ActionType.requestAtmCard),
           buildItem(Icons.book_outlined, 'Request Cheque Book', ActionType.requestChequeBook),
+          buildItem(Icons.block, 'Stop Cheque', ActionType.stopCheque)
         ],
       ),
     );
@@ -147,5 +148,6 @@ enum ActionType {
   standingOrder,
   requestAtmCard,
   requestChequeBook,
-  profile
+  profile,
+  stopCheque
 }

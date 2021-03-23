@@ -3,6 +3,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:mkombozi_mobile/pages/stop_cheque_request_page.dart';
 import 'package:mkombozi_mobile/theme/primary_background_gradient.dart';
 import 'package:mkombozi_mobile/models/account.dart';
 import 'package:mkombozi_mobile/models/service.dart';
@@ -101,6 +102,9 @@ class _HomePageState extends State<HomePage> {
         break;
       case ActionType.loanApplication:
         LoanApplicationPage.navigateTo(context, currentAccount);
+        break;
+      case ActionType.stopCheque:
+        StopChequeRequestPage.navigateTo(context, currentAccount);
         break;
       default:
     }
