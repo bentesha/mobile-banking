@@ -17,6 +17,7 @@ import 'package:mkombozi_mobile/widgets/form_cell_input.dart';
 import 'package:mkombozi_mobile/widgets/label_value_cell.dart';
 import 'package:mkombozi_mobile/widgets/workflow.dart';
 import 'package:mkombozi_mobile/widgets/workflow_item.dart';
+import 'package:mkombozi_mobile/widgets/workflow_progress_indicator.dart';
 import 'package:provider/provider.dart';
 
 class AgencyWithdrawalPage extends Workflow<_FormData> {
@@ -72,26 +73,6 @@ class _StepOne extends WorkflowItem {
       return false;
     }
 
-    // If agent number has not changed, skip resolving agent information
-    if (_data.agentNumber == _data.agent?.number) {
-      return true;
-    }
-
-    final request = ResolveAgentRequest(
-        account: _data.account,
-        agentNumber: _data.agentNumber,
-        amount: Utils.stringToDouble(_data.amount, defaultValue: 0)
-      );
-    final response = await request.send();
-    if (response.agent == null) {
-      MessageDialog.show(
-          context: context,
-          message:
-              'Agent with number "${_data.agentNumber}" could not be found.',
-          title: 'Agent Not Found');
-      return false;
-    }
-    _data.agent = response.agent;
     return true;
   }
 
@@ -167,8 +148,47 @@ class _StepTwo extends WorkflowItem {
     return false;
   }
 
+  Future<void> _resolvedAgent(BuildContext context) async {
+    // If agent number has not changed, skip resolving agent information
+    if (_data.agentNumber == _data.agent?.number) {
+      return;
+    }
+
+    _data.agent = null;
+
+    final request = ResolveAgentRequest(
+        account: _data.account,
+        agentNumber: _data.agentNumber,
+        amount: Utils.stringToDouble(_data.amount, defaultValue: 0)
+      );
+    final response = await request.send();
+    _data.agent = response.agent;
+  }
+
   @override
-  Widget build(BuildContext context) {
+  build(context) {
+    return FutureBuilder(
+      future: _resolvedAgent(context),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return WorkflowProgressIndicator(
+            'Checking agent number..'
+          );
+        }
+
+        if (snapshot.connectionState == ConnectionState.done) {
+          return _buildContent(context);
+        }
+
+        print(snapshot.connectionState);
+        print('hasData: ${snapshot.hasData}');
+
+        return Container();
+      },
+    );
+  }
+
+  Widget _buildContent(BuildContext context) {
     return Column(
       children: [
         Row(children: [
@@ -183,7 +203,7 @@ class _StepTwo extends WorkflowItem {
           )
         ]),
         SizedBox(height: 32),
-        Ink(
+        Container(
             decoration:
                 BoxDecoration(border: Border.all(color: Colors.grey.shade300)),
             child: Padding(
@@ -192,15 +212,21 @@ class _StepTwo extends WorkflowItem {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       LabelValueCell(
-                          label: 'Account', value: _data.account.maskedNumber),
+                        label: 'Account', value: _data.account.maskedNumber),
                       LabelValueCell(label: 'Amount', value: _data.amount),
                       LabelValueCell(
-                          label: 'Agent Number', value: _data.agentNumber),
+                        label: 'Agent Number',
+                        value: _data.agentNumber
+                      ),
                       LabelValueCell(
-                          label: 'Agent Name', value: _data.agent.name),
+                          label: 'Agent Name',
+                          value: _data.agent?.name ?? 'Name not found!'
+                      ),
                       LabelValueCell(
                         label: 'Service Fee',
-                        value: Formatter.formatCurrency(_data.agent.fee)
+                        value: _data?.agent?.fee == null
+                          ? '0.00'
+                          : Formatter.formatCurrency(_data.agent.fee)
                       )
                     ]
                   )
