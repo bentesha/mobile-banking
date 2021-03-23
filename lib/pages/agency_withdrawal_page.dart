@@ -3,6 +3,7 @@ import 'package:mkombozi_mobile/dialogs/message_dialog.dart';
 import 'package:mkombozi_mobile/dialogs/pin_code_dialog.dart';
 import 'package:mkombozi_mobile/formatters/decimal_input_formatter.dart';
 import 'package:mkombozi_mobile/formatters/number_input_formatter.dart';
+import 'package:mkombozi_mobile/helpers/formatters.dart';
 import 'package:mkombozi_mobile/helpers/utils.dart';
 import 'package:mkombozi_mobile/models/account.dart';
 import 'package:mkombozi_mobile/models/agent.dart';
@@ -77,7 +78,10 @@ class _StepOne extends WorkflowItem {
     }
 
     final request = ResolveAgentRequest(
-        account: _data.account, agentNumber: _data.agentNumber);
+        account: _data.account,
+        agentNumber: _data.agentNumber,
+        amount: Utils.stringToDouble(_data.amount, defaultValue: 0)
+      );
     final response = await request.send();
     if (response.agent == null) {
       MessageDialog.show(
@@ -194,7 +198,14 @@ class _StepTwo extends WorkflowItem {
                           label: 'Agent Number', value: _data.agentNumber),
                       LabelValueCell(
                           label: 'Agent Name', value: _data.agent.name),
-                    ])))
+                      LabelValueCell(
+                        label: 'Service Fee',
+                        value: Formatter.formatCurrency(_data.agent.fee)
+                      )
+                    ]
+                  )
+                )
+              )
       ],
     );
   }

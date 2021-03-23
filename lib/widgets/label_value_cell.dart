@@ -21,10 +21,11 @@ class LabelValueCell extends StatelessWidget {
           )
         ),
         SizedBox(width: 32),
-        Flexible(
+        Expanded(
           child: Text(value ?? '',
+            textAlign: TextAlign.end,
             style: Theme.of(context).textTheme.bodyText2.copyWith(
-              fontWeight: FontWeight.bold
+              fontWeight: FontWeight.bold,
             ),
             overflow: TextOverflow.visible,
           )

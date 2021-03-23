@@ -9,7 +9,7 @@ class Formatter {
   }
 
   static String formatCurrency(double amount) {
-    final formatter = NumberFormat('#,###.00');
+    final formatter = NumberFormat('#,##0.00');
     return formatter.format(amount);
   }
 }

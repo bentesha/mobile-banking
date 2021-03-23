@@ -1,8 +1,8 @@
 
 class Utils {
 
-  static double stringToDouble(String string) {
-    return double.parse(string.replaceAll(',', ''));
+  static double stringToDouble(String string, {double defaultValue}) {
+    return double.tryParse(string.replaceAll(',', '')) ?? defaultValue;
   }
 
   static bool validatePhoneNumber(String phoneNumber) {

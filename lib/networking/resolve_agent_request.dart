@@ -7,10 +7,11 @@ import 'package:mkombozi_mobile/networking/resolve_agent_response.dart';
 
 class ResolveAgentRequest extends NetworkRequest<ResolveAgentResponse> {
 
-  ResolveAgentRequest({@required this.account, @required this.agentNumber});
+  ResolveAgentRequest({@required this.account, @required this.agentNumber, @required this.amount});
 
   final Account account;
   final String agentNumber;
+  final double amount;
 
   @override
   ResolveAgentResponse createResponse(Map<String, dynamic> data) {
@@ -24,6 +25,7 @@ class ResolveAgentRequest extends NetworkRequest<ResolveAgentResponse> {
       final agent = Agent();
       agent.number = agentNumber;
       agent.name = response['resolved_name'];
+      agent.fee = double.tryParse(response['service_fee']) ?? 0;
       result.agent = agent;
     }
 
@@ -34,6 +36,7 @@ class ResolveAgentRequest extends NetworkRequest<ResolveAgentResponse> {
   Map<String, dynamic> get params => {
     'reference_to_resolve': agentNumber,
     'channel_route': '4',
+    'amount': amount.toString(),
     'institution': NetworkRequest.INSTITUTION_ID
   };
 
