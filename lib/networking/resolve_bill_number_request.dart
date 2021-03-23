@@ -63,6 +63,9 @@ class ResolveBillNumberRequest extends NetworkRequest<ResolveBillNumberResponse>
       utility = 'DAWASCO';
     } else if (mti == MTI_AIRTIME) {
       channel = '1';
+    } else if (mti == NetworkRequest.INSTITUTION_BIN) {
+      channel = '2';
+      utility = NetworkRequest.INSTITUTION_BIN;
     }
 
 

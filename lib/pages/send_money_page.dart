@@ -10,6 +10,7 @@ import 'package:mkombozi_mobile/models/branch.dart';
 import 'package:mkombozi_mobile/models/wallet_or_bank.dart';
 import 'package:mkombozi_mobile/networking/eft_request.dart';
 import 'package:mkombozi_mobile/networking/network_request.dart';
+import 'package:mkombozi_mobile/networking/resolve_bill_number_request.dart';
 import 'package:mkombozi_mobile/networking/send_money_request.dart';
 import 'package:mkombozi_mobile/services/login_service.dart';
 import 'package:mkombozi_mobile/widgets/account_selector.dart';
@@ -252,12 +253,18 @@ class _StepTwo extends WorkflowItem {
                               ? 'Phone number'
                               : 'Account number',
                           value: _data.referenceNumber),
+                      _data.walletOrBank.bin == NetworkRequest.INSTITUTION_BIN
+                      ? _ResolvableLabelValueCell(
+                        label: 'Account Name',
+                        account: _data.account,
+                        reference: _data.referenceNumber,
+                      )
+                      : SizedBox(height: 0),
                       LabelValueCell(
                           label: 'Pay from', value: _data.account.maskedNumber),
                       LabelValueCell(label: 'Amount', value: _data.amount),
                       LabelValueCell(
-                          label: 'Reference', value: _data.reference),
-                      LabelValueCell(label: 'Charges', value: '1,200.00')
+                          label: 'Reference', value: _data.reference)
                     ])))
       ],
     );
@@ -265,6 +272,85 @@ class _StepTwo extends WorkflowItem {
 
   @override
   String get title => 'Confirm';
+}
+
+class _ResolvableLabelValueCell extends StatelessWidget {
+
+  _ResolvableLabelValueCell({
+    @required this.label,
+    @required this.account,
+    @required this.reference
+  });
+
+  final String label;
+  final Account account;
+  final String reference;
+  
+  Future<String> _resolveName() async {
+    final request = ResolveBillNumberRequest(
+      account: account,
+      reference: reference,
+      mti: NetworkRequest.INSTITUTION_BIN
+    );
+    final response = await request.send();
+    return response?.info?.resolvedName;
+  }
+
+  build(context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label ?? '',
+            style: Theme.of(context).textTheme.bodyText2.copyWith(
+              color: Colors.grey.shade600
+            )
+          ),
+          SizedBox(width: 32),
+          Flexible(
+            child: FutureBuilder<String>(
+              future: _resolveName(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(
+                        height: 16,
+                        width: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2,)
+                      ),
+                      SizedBox(width: 8),
+                      Text('Checking name..', style: TextStyle(fontStyle: FontStyle.italic))
+                    ]
+                  );
+                }
+
+                if (snapshot.hasError || snapshot.data == null) {
+                  return Text('Name not found!',
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontStyle: FontStyle.italic
+                    )
+                  );
+                }
+
+                return Text(snapshot.data ?? '',
+                  style: Theme.of(context).textTheme.bodyText2.copyWith(
+                    fontWeight: FontWeight.bold
+                  ),
+                  overflow: TextOverflow.visible,
+                );
+              }
+            )
+          )
+        ],
+      )
+    );
+  }
+
 }
 
 class _FormData {
