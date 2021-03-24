@@ -4,10 +4,11 @@ import 'package:mkombozi_mobile/dialogs/message_dialog.dart';
 import 'package:mkombozi_mobile/dialogs/pin_code_dialog.dart';
 import 'package:mkombozi_mobile/formatters/number_input_formatter.dart';
 import 'package:mkombozi_mobile/models/account.dart';
-import 'package:mkombozi_mobile/networking/cheque_book_request.dart';
 import 'package:mkombozi_mobile/networking/stop_cheque_request.dart';
 import 'package:mkombozi_mobile/services/login_service.dart';
+import 'package:mkombozi_mobile/widgets/account_selector.dart';
 import 'package:mkombozi_mobile/widgets/action_button.dart';
+import 'package:mkombozi_mobile/widgets/form_cell_divider.dart';
 import 'package:mkombozi_mobile/widgets/form_cell_input.dart';
 import 'package:mkombozi_mobile/widgets/progress_view.dart';
 import 'package:provider/provider.dart';
@@ -38,6 +39,15 @@ class _PageState extends State<StopChequeRequestPage> {
   }
 
   _submitRequest() async {
+    if (_chequeNumber == null || _chequeNumber.isEmpty) {
+      MessageDialog.show(
+        context: context,
+        title: 'Validation Error',
+        message: 'Enter cheque number'
+      );
+      return;
+    }
+
     final pin = await PinCodeDialog.show(context);
     if (pin == null) {
       return;
@@ -101,7 +111,20 @@ class _PageState extends State<StopChequeRequestPage> {
                                   Text('Enter cheque number to block')
                                 ],
                               )),
-                          Divider(height: 1),
+                          SizedBox(height: 16),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 16),
+                            child: AccountSelector(
+                              label: 'Account',
+                              value: _account,
+                              onChanged: (value) {
+                                setState((){
+                                  _account = value;
+                                });
+                              }
+                            )
+                          ),
+                          FormCellDivider(),
                           Padding(
                               padding: EdgeInsets.all(16),
                               child: FormCellInput(
