@@ -23,7 +23,7 @@ class PillButton extends StatelessWidget {
         onPressed: onPressed,
         child: Text(caption, style: TextStyle(color: textColor)),
         color: color,
-        disabledColor: disabledColor,
+        disabledColor: disabledColor ?? Colors.grey.shade400.withOpacity(0.6),
         shape: StadiumBorder(),
       ));
 }

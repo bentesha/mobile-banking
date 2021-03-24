@@ -35,7 +35,9 @@ abstract class NetworkRequest<T extends NetworkResponse> {
     request.followRedirects = true;
     final deviceInfo = await DeviceInfoPlugin().androidInfo;
     final params = HashMap<String, dynamic>();
-    params['service_id']  = serviceId;
+    if(serviceId != null) {
+      params['service_id']  = serviceId;
+    }
     params['udid'] = deviceInfo.androidId;
     params.addAll(this.params);
     params.forEach((key, value) => params[key] = value ?? '');

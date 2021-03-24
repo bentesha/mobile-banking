@@ -4,8 +4,15 @@ import 'package:flutter/material.dart';
 
 class ProgressView extends StatelessWidget {
 
+  ProgressView({this.color});
+
+  final Color color;
+
   build(context) => Center(
-    child: CircularProgressIndicator()
+    child: Theme(
+      data: Theme.of(context).copyWith(accentColor: color ?? Theme.of(context).accentColor),
+      child: CircularProgressIndicator()
+    )
   );
 
 }

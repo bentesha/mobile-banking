@@ -2,6 +2,7 @@
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:mkombozi_mobile/pages/account_opening_page.dart';
 import 'package:mkombozi_mobile/pages/register_page.dart';
 import 'package:mkombozi_mobile/theme/assets.dart';
 import 'package:mkombozi_mobile/theme/primary_background_gradient.dart';
@@ -97,7 +98,15 @@ class LandingPage extends StatelessWidget {
                 onPressed: () {
                   Navigator.of(context).pushNamed(LoginPage.routeName);
                 },
-              )
+              ),
+              SizedBox(height: 16),
+              PillButton(
+                caption: 'OPEN ACCOUNT',
+                color: AppTheme.accentColor,
+                onPressed: () {
+                  AccountOpeningPage.navigateTo(context);
+                },
+              ),
             ],
           )
         ]
