@@ -8,6 +8,7 @@ class NidaVerificationRequest extends NetworkRequest<NidaVerificationResponse> {
 
   NidaVerificationRequest({
     @required this.nin,
+    @required this.phoneNumber,
     this.questionCode,
     this.answer,
     this.first = false
@@ -17,6 +18,7 @@ class NidaVerificationRequest extends NetworkRequest<NidaVerificationResponse> {
   final String questionCode;
   final String answer;
   final String nin;
+  final String phoneNumber;
 
   @override
   NetworkResponse createResponse(Map<String, dynamic> data) {
@@ -48,7 +50,8 @@ class NidaVerificationRequest extends NetworkRequest<NidaVerificationResponse> {
       'institution': NetworkRequest.INSTITUTION_ID,
       'answer': answer,
       'question': questionCode,
-      'nin': nin
+      'nin': nin,
+      'mobile': phoneNumber
     };
 
     if (first) {

@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mkombozi_mobile/formatters/number_input_formatter.dart';
+import 'package:mkombozi_mobile/formatters/phone_number_input_formatter.dart';
 import 'package:mkombozi_mobile/networking/nida_verification_request.dart';
 import 'package:mkombozi_mobile/networking/nida_verification_response.dart';
 import 'package:mkombozi_mobile/pages/login.dart';
@@ -28,7 +29,8 @@ class AccountOpeningPage extends StatefulWidget {
 class _AccountOpeningPageState extends State<AccountOpeningPage> {
 
   final bloc = _Bloc();
-  final _textController = TextEditingController();
+  final _controllerPrimary = TextEditingController();
+  final _controllerPhoneNumber = TextEditingController(text: '+255');
   final _boldYellowStyle = TextStyle(
                       fontSize: 20,
                       color: AppTheme.accentColor,
@@ -140,22 +142,32 @@ class _AccountOpeningPageState extends State<AccountOpeningPage> {
       children: [
         Text('Welcome', style: _boldYellowStyle),
         SizedBox(height: 16),
-        Text('Enter your NIDA number'),
+        Text('Enter your NIDA number and mobile number to begin'),
         SizedBox(height: 16),
         _TextField(
-          controller: _textController,
+          controller: _controllerPrimary,
           label: 'Enter your NIDA number',
           inputFormatters: [NumberInputFormatter(length: 20)],
           inputType: TextInputType.number,
           onChanged: (_) => setState((){}),
         ),
+        SizedBox(height: 16),
+        _TextField(
+          controller: _controllerPhoneNumber,
+          label: 'Mobile phone number',
+          inputFormatters: [PhoneNumberInputFormatter()],
+          inputType: TextInputType.number,
+          onChanged: (_) => setState((){}),
+        ),
         SizedBox(height: 32),
         PillButton(
-          onPressed: _textController.text.length == 20
+          onPressed: _controllerPrimary.text.length == 20
+            && _controllerPhoneNumber.text.length == 13
           ? () {
-            final nin = _textController.text;
-            bloc.beginQA(nin);
-            _textController.clear();
+            final nin = _controllerPrimary.text;
+            final phoneNumber = _controllerPhoneNumber.text;
+            bloc.beginQA(nin, phoneNumber);
+            _controllerPrimary.clear();
           }
           : null,
           caption: 'NEXT',
@@ -175,16 +187,16 @@ class _AccountOpeningPageState extends State<AccountOpeningPage> {
         Text(state.questionSw),
         SizedBox(height: 32),
         _TextField(
-          controller: _textController,
+          controller: _controllerPrimary,
           label: 'Your answer',
           onChanged: (_) => setState((){}),
         ),
         SizedBox(height: 32),
         PillButton(
-          onPressed: _textController.text.length > 3
+          onPressed: _controllerPrimary.text.length > 3
           ? () {
-            bloc.submitAnswer(state.questionCode, _textController.text);
-            _textController.clear();
+            bloc.submitAnswer(state.questionCode, _controllerPrimary.text);
+            _controllerPrimary.clear();
           }
           : null,
           caption: 'NEXT',
@@ -252,7 +264,7 @@ class _AccountOpeningPageState extends State<AccountOpeningPage> {
   @override
   void dispose() {
     bloc.close();
-    _textController.dispose();
+    _controllerPrimary.dispose();
     super.dispose();
   }
 
@@ -318,6 +330,7 @@ class _Bloc {
 
   final _controller = StreamController<_PageState>();
   String _nin;
+  String _phoneNumber;
   _PageState _state;
 
   Stream<_PageState> get stream => _controller.stream;
@@ -329,10 +342,11 @@ class _Bloc {
   }
 
   /// Starts Question & Answer session with NIDA
-  void beginQA(String nin) async {
+  void beginQA(String nin, String phoneNumber) async {
     _setLoading();
     _nin = nin;
-    final request = NidaVerificationRequest(nin: nin, first: true);
+    _phoneNumber = phoneNumber.substring(1); // Skip + sign
+    final request = NidaVerificationRequest(nin: nin, first: true, phoneNumber: _phoneNumber);
     final response = await request.send();
     final state = _mapResponseToState(response);
     _emit(state);
@@ -343,6 +357,7 @@ class _Bloc {
     _setLoading();
     final request = NidaVerificationRequest(
       nin: _nin,
+      phoneNumber: _phoneNumber,
       questionCode: questionCode,
       answer: answer
     );

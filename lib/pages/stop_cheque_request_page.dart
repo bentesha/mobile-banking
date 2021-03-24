@@ -85,7 +85,7 @@ class _PageState extends State<StopChequeRequestPage> {
   build(context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('Stop Cheque Request',
+          title: Text('Stop Cheque',
               style: Theme.of(context).textTheme.headline6),
           backgroundColor: Colors.white,
           iconTheme:
@@ -108,7 +108,7 @@ class _PageState extends State<StopChequeRequestPage> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('Enter cheque number to block')
+                                  Text('Select account and enter cheque number to block')
                                 ],
                               )),
                           SizedBox(height: 16),
@@ -140,7 +140,7 @@ class _PageState extends State<StopChequeRequestPage> {
                         ],
                       )),
             ActionButton(
-              caption: 'SEND REQUEST',
+              caption: 'STOP CHEQUE',
               loading: _loading,
               onPressed: _loading ? null : _submitRequest,
             )
