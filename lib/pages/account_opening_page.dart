@@ -92,6 +92,13 @@ class _AccountOpeningPageState extends State<AccountOpeningPage> {
     );
   }
 
+  String _count(maxLength, currentLength) {
+    if (maxLength <= currentLength) {
+      return '';
+    }
+    return (maxLength - currentLength).toString();
+  }
+
   @override
   Widget build(context) {
     return Scaffold(
@@ -150,21 +157,23 @@ class _AccountOpeningPageState extends State<AccountOpeningPage> {
         Text('Welcome', style: _boldYellowStyle),
         SizedBox(height: 16),
         Text('Enter your NIDA number and mobile number to begin'),
-        SizedBox(height: 16),
+        SizedBox(height: 8),
         _TextField(
           controller: _controllerPrimary,
           label: 'Enter your NIDA number',
           inputFormatters: [NumberInputFormatter(length: 20)],
           inputType: TextInputType.number,
           onChanged: (_) => setState((){}),
+          counter: _count(20, _controllerPrimary.text.length),
         ),
-        SizedBox(height: 16),
+        SizedBox(height: 8),
         _TextField(
           controller: _controllerPhoneNumber,
           label: 'Mobile phone number',
           inputFormatters: [PhoneNumberInputFormatter()],
           inputType: TextInputType.number,
           onChanged: (_) => setState((){}),
+          counter: _count(13, _controllerPhoneNumber.text.length),
         ),
         SizedBox(height: 32),
         PillButton(
@@ -185,14 +194,11 @@ class _AccountOpeningPageState extends State<AccountOpeningPage> {
   }
 
   Widget _buildSelectBranch(_SelectBranchState state) {
-    final textStyle = TextStyle(
-      color: AppTheme.accentColor
-    );
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Select branc', style: _boldYellowStyle),
+        Text('Select branch', style: _boldYellowStyle),
         SizedBox(height: 8),
         Text('Select the brach at which your account will be opened'),
         SizedBox(height: 32),
@@ -203,18 +209,23 @@ class _AccountOpeningPageState extends State<AccountOpeningPage> {
               style: TextStyle(color: Colors.white),
             ),
             value: _branch,
+            selectedItemBuilder: (context) => 
+              state.branches.map((branch) => Center(
+                child: Text(branch.name, style: TextStyle(color: AppTheme.accentColor))
+              )
+            ).toList(),
             items: state.branches.map((branch) => DropdownMenuItem(
               value: branch,
               child: Text(branch.name),
             )).toList(),
-            dropdownColor: AppTheme.accentColor,
             iconEnabledColor: AppTheme.accentColor,
+            dropdownColor: AppTheme.accentColor,
             underline: Container(
               color: AppTheme.accentColor,
               height: 2,
               width: double.infinity,
             ),
-              onChanged: (value) => setState(() => _branch = value),
+            onChanged: (value) => setState(() => _branch = value),
           )
         ),
         SizedBox(height: 32),
@@ -333,7 +344,8 @@ class _TextField extends StatelessWidget {
       this.onChanged,
       this.controller,
       this.inputType,
-      this.prefix});
+      this.prefix,
+      this.counter});
 
   final String label;
   final List<TextInputFormatter> inputFormatters;
@@ -342,6 +354,7 @@ class _TextField extends StatelessWidget {
   final TextEditingController controller;
   final Widget prefix;
   final TextInputType inputType;
+  final String counter;
 
   @override
   build(context) {
@@ -365,6 +378,11 @@ class _TextField extends StatelessWidget {
         prefixStyle: textStyle,
         prefix: prefix,
         hintText: label,
+        counter: counter == null
+        ? null
+        : Text(counter,
+          style: TextStyle(color: AppTheme.accentColor)
+        ),
         hintStyle: TextStyle(
             letterSpacing: 1,
             fontWeight: FontWeight.w300,
