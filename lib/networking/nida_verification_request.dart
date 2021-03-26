@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:mkombozi_mobile/models/branch.dart';
 import 'package:mkombozi_mobile/networking/network_request.dart';
 import 'package:mkombozi_mobile/networking/network_response.dart';
 import 'package:mkombozi_mobile/networking/nida_verification_response.dart';
@@ -9,9 +10,10 @@ class NidaVerificationRequest extends NetworkRequest<NidaVerificationResponse> {
   NidaVerificationRequest({
     @required this.nin,
     @required this.phoneNumber,
+    @required this.branch,
     this.questionCode,
     this.answer,
-    this.first = false
+    this.first = false,
   });
 
   final bool first;
@@ -19,6 +21,7 @@ class NidaVerificationRequest extends NetworkRequest<NidaVerificationResponse> {
   final String answer;
   final String nin;
   final String phoneNumber;
+  final Branch branch;
 
   @override
   NetworkResponse createResponse(Map<String, dynamic> data) {
@@ -48,6 +51,7 @@ class NidaVerificationRequest extends NetworkRequest<NidaVerificationResponse> {
   Map<String, dynamic> get params {
     final params = {
       'institution': NetworkRequest.INSTITUTION_ID,
+      'branch_code': branch.code,
       'answer': answer,
       'question': questionCode,
       'nin': nin,

@@ -5,8 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mkombozi_mobile/formatters/number_input_formatter.dart';
 import 'package:mkombozi_mobile/formatters/phone_number_input_formatter.dart';
+import 'package:mkombozi_mobile/models/branch.dart';
+import 'package:mkombozi_mobile/networking/network_response.dart';
 import 'package:mkombozi_mobile/networking/nida_verification_request.dart';
 import 'package:mkombozi_mobile/networking/nida_verification_response.dart';
+import 'package:mkombozi_mobile/networking/resolve_branch_request.dart';
+import 'package:mkombozi_mobile/networking/resolve_branch_response.dart';
 import 'package:mkombozi_mobile/pages/login.dart';
 import 'package:mkombozi_mobile/theme/primary_background_gradient.dart';
 import 'package:mkombozi_mobile/theme/theme.dart';
@@ -31,6 +35,7 @@ class _AccountOpeningPageState extends State<AccountOpeningPage> {
   final bloc = _Bloc();
   final _controllerPrimary = TextEditingController();
   final _controllerPhoneNumber = TextEditingController(text: '+255');
+  Branch _branch;
   final _boldYellowStyle = TextStyle(
                       fontSize: 20,
                       color: AppTheme.accentColor,
@@ -125,6 +130,8 @@ class _AccountOpeningPageState extends State<AccountOpeningPage> {
   Widget _buildState(_PageState state) {
     if(state is _InitState) {
       return _buildInit(state);
+    } else if(state is _SelectBranchState) {
+      return _buildSelectBranch(state);
     } else if (state is _QAState) {
       return _buildQA(state);
     } else if (state is _CompleteState) {
@@ -174,6 +181,54 @@ class _AccountOpeningPageState extends State<AccountOpeningPage> {
           color: AppTheme.accentColor,
         )
       ]
+    );
+  }
+
+  Widget _buildSelectBranch(_SelectBranchState state) {
+    final textStyle = TextStyle(
+      color: AppTheme.accentColor
+    );
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Select branc', style: _boldYellowStyle),
+        SizedBox(height: 8),
+        Text('Select the brach at which your account will be opened'),
+        SizedBox(height: 32),
+        SizedBox(
+          width: double.infinity,
+          child: DropdownButton<Branch>(
+            hint: Text('Choose branch',
+              style: TextStyle(color: Colors.white),
+            ),
+            value: _branch,
+            items: state.branches.map((branch) => DropdownMenuItem(
+              value: branch,
+              child: Text(branch.name),
+            )).toList(),
+            dropdownColor: AppTheme.accentColor,
+            iconEnabledColor: AppTheme.accentColor,
+            underline: Container(
+              color: AppTheme.accentColor,
+              height: 2,
+              width: double.infinity,
+            ),
+              onChanged: (value) => setState(() => _branch = value),
+          )
+        ),
+        SizedBox(height: 32),
+        PillButton(
+          onPressed: _branch != null
+          ? () {
+            bloc.selectBranch(_branch);
+            _controllerPrimary.clear();
+          }
+          : null,
+          caption: 'NEXT',
+          color: AppTheme.accentColor
+        )
+      ],
     );
   }
 
@@ -331,6 +386,7 @@ class _Bloc {
   final _controller = StreamController<_PageState>();
   String _nin;
   String _phoneNumber;
+  Branch _branch;
   _PageState _state;
 
   Stream<_PageState> get stream => _controller.stream;
@@ -346,7 +402,21 @@ class _Bloc {
     _setLoading();
     _nin = nin;
     _phoneNumber = phoneNumber.substring(1); // Skip + sign
-    final request = NidaVerificationRequest(nin: nin, first: true, phoneNumber: _phoneNumber);
+    final request = ResolveBranchRequest();
+    final response = await request.send();
+    final state = _mapResponseToState(response);
+    _emit(state);
+  }
+
+  void selectBranch(Branch branch) async {
+    _branch = branch;
+    _setLoading();
+    final request = NidaVerificationRequest(
+      first: true,
+      nin: _nin,
+      phoneNumber: _phoneNumber,
+      branch: _branch
+    );
     final response = await request.send();
     final state = _mapResponseToState(response);
     _emit(state);
@@ -359,7 +429,8 @@ class _Bloc {
       nin: _nin,
       phoneNumber: _phoneNumber,
       questionCode: questionCode,
-      answer: answer
+      answer: answer,
+      branch: _branch
     );
     final response = await request.send();
     final state = _mapResponseToState(response);
@@ -371,15 +442,17 @@ class _Bloc {
     _controller.add(state);
   }
 
-  _PageState _mapResponseToState(NidaVerificationResponse response) {
-    if (response.code == 200) {
+  _PageState _mapResponseToState(NetworkResponse response) {
+    if (response is NidaVerificationResponse && response.code == 200) {
       return _QAState(
         questionCode: response.questionCode,
         questionSw: response.questionSw,
         questionEn: response.questionEn
       );
-    } else if(response.code == 210) {
+    } else if(response is NidaVerificationResponse && response.code == 210) {
       return _CompleteState();
+    } else if(response is ResolveBranchResponse && response.code == 200) {
+      return _SelectBranchState(response.branches);
     } else {
       return _FailedState(
         message: response.message,
@@ -417,6 +490,13 @@ abstract class _PageState {
 
 class _InitState extends _PageState {
   _InitState() : super(PopAction.prompt);
+}
+
+class _SelectBranchState extends _PageState {
+
+  _SelectBranchState(this.branches) : super(PopAction.restart);
+
+  final List<Branch> branches;
 }
 
 @immutable

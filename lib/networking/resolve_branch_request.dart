@@ -1,7 +1,4 @@
 
-import 'package:flutter/material.dart';
-import 'package:mkombozi_mobile/models/account.dart';
-import 'package:mkombozi_mobile/models/bank.dart';
 import 'package:mkombozi_mobile/models/branch.dart';
 import 'package:mkombozi_mobile/networking/network_request.dart';
 import 'package:mkombozi_mobile/networking/network_response.dart';
@@ -9,20 +6,12 @@ import 'package:mkombozi_mobile/networking/resolve_branch_response.dart';
 
 class ResolveBranchRequest extends NetworkRequest<ResolveBranchResponse> {
 
-  ResolveBranchRequest({
-    @required this.account,
-    @required this.bank,
-  });
-
-  final Account account;
-  final Bank bank;
+  ResolveBranchRequest();
 
   @override
   Map<String, dynamic> get params => {
-    'account_number': account.accountNumber,
-    'subscriber': account.subscriberId,
-    'institution': account.institutionId,
-    'eft_id': bank.eftId
+    'institution': NetworkRequest.INSTITUTION_ID,
+    'eft_id': NetworkRequest.INSTITUTION_EFT_ID,
   };
 
   @override

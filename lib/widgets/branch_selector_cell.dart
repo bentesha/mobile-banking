@@ -37,7 +37,7 @@ class _BranchSelectorCellState extends State<BranchSelectorCell> {
 
   Future<List<Branch>> _getBranches() async {
     if (_branches == null && widget.account != null && widget.bank != null) {
-      final request = ResolveBranchRequest(account: widget.account, bank: widget.bank);
+      final request = ResolveBranchRequest();
       final response = await request.send();
       _branches = response.branches;
     }
