@@ -2,6 +2,7 @@
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:mkombozi_mobile/app_config.dart';
 import 'package:mkombozi_mobile/pages/account_opening_page.dart';
 import 'package:mkombozi_mobile/pages/register_page.dart';
 import 'package:mkombozi_mobile/theme/assets.dart';
@@ -101,6 +102,7 @@ class LandingPage extends StatelessWidget {
                 },
               ),
               SizedBox(height: 16),
+              if (AppConfig.enableAccountOpening)
               PillButton(
                 caption: 'OPEN ACCOUNT',
                 color: AppTheme.accentColor,
