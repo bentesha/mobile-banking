@@ -5,6 +5,7 @@ import 'package:mkombozi_mobile/pages/landing_page.dart';
 import 'package:mkombozi_mobile/pages/login.dart';
 import 'package:mkombozi_mobile/pages/register_page.dart';
 import 'package:mkombozi_mobile/services/login_service.dart';
+import 'package:mkombozi_mobile/theme/theme.dart';
 import 'package:provider/provider.dart';
 
 class MyApp extends StatelessWidget {
@@ -23,12 +24,11 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.blue,
-        accentColor: Color(0xffa3cc55),
+        accentColor: AppTheme.accentColor,
         canvasColor: Colors.white,
-        primaryColor: Color(0xff086086),
+        primaryColor: AppTheme.primaryColor,
         textTheme: theme.textTheme.copyWith(
-          caption: theme.textTheme.caption.copyWith(color: Colors.blue.shade700)
+          // caption: theme.textTheme.caption.copyWith(color: Colors.blue.shade700)
         ),
         iconTheme: theme.iconTheme.copyWith(color: Colors.grey.shade500),
       ),

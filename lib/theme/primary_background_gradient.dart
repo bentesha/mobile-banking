@@ -8,10 +8,10 @@ class PrimaryBackgroundGradient extends LinearGradient {
       begin: Alignment.bottomLeft,
       end: Alignment.topRight,
       colors: [
-        Color(0xff0a3057),
-        Color(0xff0a3057),
-        AppTheme.primaryColor,//Color(0xff338ef9),
-        Color(0xff0a3057),
+        Color(0xff0071a3),
+        Color(0xff0071a3),
+        Color(0xff0071a3),
+        Color(0xff0071a3),
       ]
     );
 

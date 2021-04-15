@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mkombozi_mobile/models/service.dart';
+import 'package:mkombozi_mobile/theme/theme.dart';
 
 class ServiceLogo extends StatelessWidget {
 
@@ -27,7 +28,7 @@ class ServiceLogo extends StatelessWidget {
           height: height,
           width: width,
           padding: EdgeInsets.all(0),
-          child: SvgPicture.asset(asset, color: Colors.blue.shade800)
+          child: SvgPicture.asset(asset, color: AppTheme.menuTextColor)
       );
     }
     return CachedNetworkImage(imageUrl: service.logoUrl, height: height, width: width);

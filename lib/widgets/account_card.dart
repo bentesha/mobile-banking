@@ -27,7 +27,7 @@ class AccountCard extends StatelessWidget {
                   end: Alignment.topRight,
                   colors: [
                     Color(0xff009de4),
-                    Color(0xff2170b5),
+                    Theme.of(context).primaryColor,// Color(0xff2170b5),
                     Color(0xff049bde),
                   ]),
               image: DecorationImage(

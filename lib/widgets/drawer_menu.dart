@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:mkombozi_mobile/services/login_service.dart';
+import 'package:mkombozi_mobile/theme/theme.dart';
 import 'package:provider/provider.dart';
 
 class DrawerMenu extends StatelessWidget {
@@ -36,9 +37,9 @@ class DrawerMenu extends StatelessWidget {
                 begin: Alignment.bottomLeft,
                 end: Alignment.topRight,
                 colors: [
-                  Color(0xff0a3057),
-                  Color(0xff338ef9),
-                  Color(0xff0a3057),
+                  Color(0xff0071a3),
+                  AppTheme.primaryColor,
+                  Color(0xff0071a3),
                 ]
             ),
             image: DecorationImage(
@@ -55,12 +56,12 @@ class DrawerMenu extends StatelessWidget {
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  CircleAvatar(
-                    backgroundImage: AssetImage('assets/mkcb_logo.png'),
-                    backgroundColor: Colors.white,
-                    radius: 36,
-                  ),
-                  SizedBox(height: 16),
+                  // CircleAvatar(
+                  //   backgroundImage: AssetImage('assets/mkcb_logo.png'),
+                  //   backgroundColor: Colors.white,
+                  //   radius: 36,
+                  // ),
+                  SizedBox(height: 90),
                   InkWell(
                     onTap: () {
                       Navigator.of(context).pop();
@@ -128,9 +129,9 @@ class DrawerMenu extends StatelessWidget {
               }
             },
             child: ListTile(
-                leading: Icon(icon, color: Colors.blue.shade800),
+                leading: Icon(icon, color: AppTheme.menuTextColor),
                 title: Text(name,
-                    style: TextStyle(color: Colors.blue.shade800)
+                    style: TextStyle(color: AppTheme.menuTextColor)
                 )
             )
         );

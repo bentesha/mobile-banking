@@ -1,6 +1,6 @@
 
 abstract class Assets {
 
-  static final appLogo = 'assets/mkcb_logo.png';
+  static final appLogo = 'assets/brand-logo.png';
 
 }

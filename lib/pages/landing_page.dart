@@ -28,7 +28,7 @@ class LandingPage extends StatelessWidget {
           Expanded(
             child: Image.asset(Assets.appLogo,
               height: 150,
-              width: 150,
+              width: 200,
               fit: BoxFit.contain,
               color: Colors.white
             )
@@ -86,6 +86,7 @@ class LandingPage extends StatelessWidget {
               PillButton(
                 caption: 'REGISTER',
                 color: AppTheme.accentColor,
+                textColor: Colors.white,
                 onPressed: () {
                   Navigator.of(context).pushNamed(RegisterPage.routeName);
                 },
@@ -103,6 +104,7 @@ class LandingPage extends StatelessWidget {
               PillButton(
                 caption: 'OPEN ACCOUNT',
                 color: AppTheme.accentColor,
+                textColor: Colors.white,
                 onPressed: () {
                   AccountOpeningPage.navigateTo(context);
                 },

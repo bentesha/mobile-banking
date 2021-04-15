@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:mkombozi_mobile/theme/theme.dart';
 
 class SelectWithdrawalMethodPage extends StatelessWidget {
 
@@ -21,9 +22,9 @@ class SelectWithdrawalMethodPage extends StatelessWidget {
                       begin: Alignment.bottomLeft,
                       end: Alignment.topRight,
                       colors: [
-                        Color(0xff0a3057),
-                        Color(0xff338ef9),
-                        Color(0xff0a3057),
+                        AppTheme.menuTextColor,
+                        Theme.of(context).primaryColor,
+                        AppTheme.menuTextColor,
                       ]
                   )
               ),
