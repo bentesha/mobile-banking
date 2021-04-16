@@ -14,12 +14,11 @@ class LoginRequest extends NetworkRequest<LoginResponse> {
   }
 
   final String pin;
-  final String institution = NetworkRequest.INSTITUTION_ID;
 
   @override
   Map<String, dynamic> get params => {
     'pin': pin,
-    'institution': institution
+    'institution': NetworkRequest.INSTITUTION_ID
   };
 
   @override
