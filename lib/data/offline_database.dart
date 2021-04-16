@@ -11,7 +11,7 @@ import 'package:mkombozi_mobile/models/wallet.dart';
 import 'package:sqflite/sqflite.dart';
 
 class OfflineDatabase {
-  static const String DATABASE_NAME = 'mkcb.db';
+  static const String DATABASE_NAME = 'database.db';
 
   User _currentUser;
 
