@@ -41,9 +41,12 @@ class BalanceRequest extends NetworkRequest<BalanceResponse> {
     final String message = response['message'];
     final result = BalanceResponse(code, message);
 
-    result.balance = response['balance'];
-    result.currency = response['currency'];
-    result.transaction = response['transaction'];
+    if (result.code == 200) {
+      final num number = response['balance'];
+      result.balance = number.toDouble();
+      result.currency = response['currency'];
+      result.transaction = response['transaction'];
+    }
 
     return result;
   }
