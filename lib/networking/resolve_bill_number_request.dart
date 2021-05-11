@@ -18,13 +18,15 @@ class ResolveBillNumberRequest extends NetworkRequest<ResolveBillNumberResponse>
     @required this.reference,
     @required this.account,
     @required this.mti,
-    this.utility
+    this.utility,
+    this.isWallet = false
   });
 
   final String reference;
   final Account account;
   final String mti;
   String utility;
+  final bool isWallet;
 
   @override
   NetworkResponse createResponse(Map<String, dynamic> data) {
@@ -51,6 +53,10 @@ class ResolveBillNumberRequest extends NetworkRequest<ResolveBillNumberResponse>
   Map<String, dynamic> get params {
     String channel = '10';
     String utility = this.utility;
+    if (isWallet) {
+      channel = '1';
+      utility = mti;
+    }
     if (mti == MTI_LUKU) {
       channel = '7';
       utility = 'LUKU';
