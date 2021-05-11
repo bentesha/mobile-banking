@@ -329,7 +329,7 @@ class _StepTwo extends WorkflowItem {
                       LabelValueCell(
                           label: 'Pay from', value: _data.account.maskedNumber),
                       LabelValueCell(
-                          label: 'Reference number',
+                          label: _referenceAlias(),
                           value: _data.referenceNumber),
                       LabelValueCell(label: 'Amount', value: _data.amount),
                       LabelValueCell(
@@ -337,6 +337,18 @@ class _StepTwo extends WorkflowItem {
                     ])))
       ],
     );
+  }
+
+  String _referenceAlias() {
+    final map = {
+      'LUKU': 'LUKU No.',
+      'DSTV': 'DStv No.',
+      'AZAM': 'Account No.',
+      'STARTIMES': 'Account No.',
+      'DAWASCO': 'Control Number.',
+      'GEPE': 'Contorl Number'
+    };
+    return map[_data.service.mti] ?? 'Reference number';
   }
 
   @override
