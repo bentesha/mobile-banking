@@ -17,7 +17,7 @@ class DrawerMenu extends StatelessWidget {
         children: [
           buildHeader(),
           buildItem(Icons.history_toggle_off, 'Mini Statement', ActionType.miniStatement),
-          buildItem(Icons.history_sharp, 'Full Statement', ActionType.fullStatement),
+          // buildItem(Icons.history_sharp, 'Full Statement', ActionType.fullStatement),
           buildItem(Icons.lightbulb, 'My LUKU Tokens', ActionType.lukuTokens),
           buildItem(Icons.money, 'Loan Application', ActionType.loanApplication),
           buildItem(Icons.payments, 'Salary Advance', ActionType.salaryAdvance),
