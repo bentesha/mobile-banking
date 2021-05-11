@@ -1,12 +1,9 @@
 
 import 'package:mkombozi_mobile/models/bank.dart';
-import 'package:mkombozi_mobile/models/branch.dart';
 import 'package:mkombozi_mobile/networking/send_money_request.dart';
 import 'package:mkombozi_mobile/utils/utils.dart';
 
 class EFTRequest extends SendMoneyRequest {
-
-  Branch branch;
 
   @override
   Map<String, dynamic> get params => {
@@ -16,7 +13,6 @@ class EFTRequest extends SendMoneyRequest {
     'pin': pin,
     'destination_institution_code': (walletOrBank as Bank).eftId,
     'destination_institution_name': walletOrBank.name,
-    'destination_branch_code': branch?.code,
     'destination_account': referenceNumber,
     'destination_bank': (walletOrBank as Bank).bin,
     'mobile': user.mobile,

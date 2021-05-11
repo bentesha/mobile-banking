@@ -163,7 +163,7 @@ class OfflineDatabase {
   }
 
   Future<List<Bank>> getBanks() async {
-    final result = await _db.query('bank', where: 'eft_id IS NOT NULL');
+    final result = await _db.query('bank');
     return result.map((entry) => Bank.fromMap(entry)).toList();
   }
 

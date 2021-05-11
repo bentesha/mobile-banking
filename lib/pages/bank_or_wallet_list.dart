@@ -22,9 +22,10 @@ class BankOrWalletListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('list type: $listType');
     return Scaffold(
         appBar: AppBar(
-            title: Text('Select ' + this.listType == 'bank' ? 'Bank' : 'Wallet')
+            title: Text('Select ' + (this.listType == 'bank' ? 'Bank' : 'Wallet'))
         ),
         body: SafeArea(
             child: Consumer<AccountService>(

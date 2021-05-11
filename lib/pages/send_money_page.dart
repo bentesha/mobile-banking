@@ -64,16 +64,8 @@ class _StepOne extends WorkflowItem {
   @override
   Future<bool> moveNext(context) async {
     String message;
-    final branchRequired = _data.walletOrBank is Bank
-      && _data.walletOrBank.bin != NetworkRequest.INSTITUTION_BIN;
     
-    if (!branchRequired) {
-      _data.branch = null;
-    }
-    
-    if (branchRequired && _data.branch == null) {
-      message = 'Select branch';
-    } else if (_data._account == null) {
+    if (_data._account == null) {
       message = 'Account is required';
     } else if (_data.walletOrBank == null) {
       message = 'Service is required';
@@ -115,27 +107,6 @@ class _StepOne extends WorkflowItem {
                       _notifier.value = value;
                     }),
                 FormCellDivider(height: 32),
-                (_data.walletOrBank is Bank) && _data.walletOrBank.bin != NetworkRequest.INSTITUTION_BIN
-                ? Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    BranchSelectorCell(
-                      label: 'Banch',
-                      hintText: 'Select Branch',
-                      icon: Icon(Icons.house),
-                      account: _data.account,
-                      bank: _data.walletOrBank as Bank,
-                      value: _data.branch,
-                      onChanged: (value) {
-                        print(value?.name ?? 'no name');
-                        _data.branch = value;
-                      },
-                    ),
-                    FormCellDivider()
-                  ],
-                )
-                : SizedBox(height: 0, width: 0),
                 AccountSelector(
                   label: 'Pay from account',
                   value: _data.account,
@@ -200,9 +171,6 @@ class _StepTwo extends WorkflowItem {
     request.referenceNumber = _data.referenceNumber;
     request.amount = Utils.stringToDouble(_data.amount);
     request.reference = _data._referenceNumber;
-    if (request is EFTRequest) {
-      request.branch = _data.branch;
-    }
 
     final response = await request.send();
     if (response.code == 200) {
@@ -229,10 +197,11 @@ class _StepTwo extends WorkflowItem {
 
     final request = ResolveBillNumberRequest(
       account: _data.account,
-      reference: _data.reference,
+      reference: _data.referenceNumber,
       mti: _data.walletOrBank.isWallet
         ? _data.walletOrBank.bin
-        : NetworkRequest.INSTITUTION_BIN
+        : NetworkRequest.INSTITUTION_BIN,
+      isWallet: _data.walletOrBank.isWallet
     );
     final response = await request.send();
     _data.info = response.info;
@@ -286,11 +255,6 @@ class _StepTwo extends WorkflowItem {
                     children: [
                       LabelValueCell(
                           label: 'Send to', value: _data.walletOrBank.name),
-                      _data.branch != null
-                      ? LabelValueCell(
-                        label: 'Branch', value: _data.branch.name
-                      )
-                      : SizedBox(height: 0, width: 0),
                       LabelValueCell(
                           label: _data.walletOrBank.isWallet
                               ? 'Phone number'
