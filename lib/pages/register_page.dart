@@ -34,13 +34,13 @@ class _PageState extends State<RegisterPage> {
       _loading = true;
     });
     final mobile = _mobileController.text.substring(1);
-    final deviceInfo = await DeviceInfoPlugin().androidInfo;
+    final deviceInfo = await DeviceInfoPlugin().iosInfo;
 
     final request = RegisterRequest(
         mobile: mobile,
         pin: _pinController.text,
         model: deviceInfo.model,
-        udid: deviceInfo.androidId);
+        udid: deviceInfo.identifierForVendor);
     final response = await request.send();
     if (response.code == 200) {
       OtpPage.navigateTo(context, _mobileController.text);
