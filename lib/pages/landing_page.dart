@@ -46,7 +46,7 @@ class LandingPage extends StatelessWidget {
                   )
                 ),
                 SizedBox(height: 8),
-                Text('MWANGA HAKIKA BANK',
+                Text('Mwanga Hakika Microfinance Bank Limited',
                   style: TextStyle(
                     fontSize: 16,
                     color: AppTheme.primaryColor,
