@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
         ? START_PAGE : LoginPage.routeName;
 
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'MHB Mobile Banking',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         accentColor: AppTheme.accentColor,
